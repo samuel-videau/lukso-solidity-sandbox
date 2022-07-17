@@ -13,7 +13,7 @@ export class EthLogs {
 
   public addLog(log: Log) {
     const method = this.solMethodsHashesRepo.get(log.topics[0]) ? this.solMethodsHashesRepo.get(log.topics[0]) as SolMethod : UnknownSolMethod;
-    this.ethLogs.push(new EthLog(log, method));
+    this.ethLogs.push(new EthLog(log, {method}));
   }
 
   public getLogs() {
