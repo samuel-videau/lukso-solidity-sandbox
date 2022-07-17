@@ -6,12 +6,16 @@ import {
   initialUniversalProfile,
   LSP3UniversalProfileMetadata
 } from "./models/lsp3-universal-profile-metadata.model";
-// import {generatePermissionKey} from "./utils/generate-permission-key";
 import {URLDataWithHash} from "@erc725/erc725.js/build/main/src/types/encodeData/JSONURL";
 import {Contract} from "web3-eth-contract";
 import UniversalProfileArtifact from "./abi/UniversalProfile.json";
 import {AbiItem} from "web3-utils";
 import {generatePermissionKey} from "./utils/generate-permission-key";
+import {EthLogs} from "../EthLogs/EthLogs.class";
+import {UniversalProfileLogTypes} from "./utils/UniversalProfileLogTypes";
+import { Log } from "web3-core";
+import { Subscription } from "web3-core-subscriptions";
+import {EthLog} from "../EthLogs/EthLog.class";
 
 interface GetDataDynamicKey {
   keyName: string;
@@ -45,12 +49,18 @@ export class UniversalProfileReader {
 
   protected _web3: Web3;
   private _metadata: LSP3UniversalProfileMetadata = initialUniversalProfile();
+  private _logs: EthLogs = new EthLogs(UniversalProfileLogTypes);
+  private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
     this._erc725 = new ERC725(schema, address, web3.currentProvider, {ipfsGateway})
     this._address = address;
     this._web3 = web3;
     this._contract = new this._web3.eth.Contract(UniversalProfileArtifact.abi as AbiItem[], address);
+    this._logsSubscription = web3.eth.subscribe('logs', {
+      fromBlock: 0,
+      address: this._address,
+    });
   }
 
   get metadata(): LSP3UniversalProfileMetadata {
@@ -77,12 +87,7 @@ export class UniversalProfileReader {
     return await this._erc725.fetchData(keys);
   }
 
-  private async fetchMetadata() {
-    const data = await this._erc725.fetchData(['LSP3Profile']);
-    this._metadata = JSON.parse(JSON.stringify(data[0])).value.LSP3Profile as LSP3UniversalProfileMetadata;
-  }
-
-  async fetchPermissionsOf(address: string): Promise<Permissions | false> {
+  public async fetchPermissionsOf(address: string): Promise<Permissions | false> {
     try {
       const permissionsValue: string = (await this.getDataUnverified([generatePermissionKey(address)]))[0] as string;
       return ERC725.decodePermissions(permissionsValue);
@@ -90,5 +95,33 @@ export class UniversalProfileReader {
       console.log(e);
       return false;
     }
+  }
+
+  public async subscribeLogs(fromBlock: number): Promise<void> {
+    this._logsSubscription = this._web3.eth.subscribe('logs', {
+      fromBlock,
+      address: this._address,
+    });
+
+    this._logsSubscription.subscribe(async (error, res) => {
+      if (error) {
+        await this._logsSubscription.unsubscribe();
+      } else if (res.transactionHash) {
+        this._logs.addLog(res);
+      }
+    })
+  }
+
+  public async unsubscribeLogs(): Promise<void> {
+    await this._logsSubscription.unsubscribe();
+  }
+
+  public getLogs(): EthLog[] {
+    return this._logs.getLogs();
+  }
+
+  private async fetchMetadata() {
+    const data = await this._erc725.fetchData(['LSP3Profile']);
+    this._metadata = JSON.parse(JSON.stringify(data[0])).value.LSP3Profile as LSP3UniversalProfileMetadata;
   }
 }
