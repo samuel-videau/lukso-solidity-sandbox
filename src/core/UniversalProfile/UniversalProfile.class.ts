@@ -1,4 +1,3 @@
-import Web3 from "web3";
 import {Contract} from "web3-eth-contract";
 import {AbiItem} from 'web3-utils';
 import LSP6KeyManagerArtifact from './abi/LSP6KeyManager.json';
@@ -31,16 +30,25 @@ export class UniversalProfile extends UniversalProfileReader {
 
   public async setData(keys: string[], values: string[]) {
     const bytecode = this._contract.methods.setData(keys, values).encodeABI();
-    await this.executeWithKeyManager(bytecode, this._web3);
+    await this.executeWithKeyManager(bytecode);
   }
 
   public async execute(type: ERC725OperationType, to: string, value: number, bytecode: string): Promise<any> {
     if (this.hasKeyManager()) {
       const upExecutionBytes = this._contract.methods.execute(type, to, value, bytecode).encodeABI();
-      return await this.executeWithKeyManager(this._eoa, upExecutionBytes);
+      return await this.executeWithKeyManager(upExecutionBytes);
     } else {
       const eoa: string = this._eoa;
       return await this._contract.methods.execute(type, to, value, bytecode).send({eoa});
+    }
+  }
+
+  public getBytecodeExecution(type: ERC725OperationType, to: string, value: number, bytecode: string): string {
+    if (this.hasKeyManager()) {
+      const upExecutionBytes = this._contract.methods.execute(type, to, value, bytecode).encodeABI();
+      return this.getBytecodeOfExecutionWithKeyManager(upExecutionBytes);
+    } else {
+      return this._contract.methods.execute(type, to, value, bytecode).encodeABI();
     }
   }
 
@@ -53,10 +61,15 @@ export class UniversalProfile extends UniversalProfileReader {
     this._keyManagerAddress = await this._contract.methods.owner().call();
   }
 
-  private async executeWithKeyManager(bytes: string, web3: Web3): Promise<any> {
-    const contract: Contract = new web3.eth.Contract(LSP6KeyManagerArtifact.abi as AbiItem[], this._keyManagerAddress);
+  private async executeWithKeyManager(bytes: string): Promise<any> {
+    const contract: Contract = new this._web3.eth.Contract(LSP6KeyManagerArtifact.abi as AbiItem[], this._keyManagerAddress);
     const eoa: string = this._eoa;
     return await contract.methods.execute(bytes).send({ from: eoa });
+  }
+
+  private getBytecodeOfExecutionWithKeyManager(bytes: string): string {
+    const contract: Contract = new this._web3.eth.Contract(LSP6KeyManagerArtifact.abi as AbiItem[], this._keyManagerAddress);
+    return contract.methods.execute(bytes).encodeABI();
   }
 
   private hasKeyManager(): boolean {
