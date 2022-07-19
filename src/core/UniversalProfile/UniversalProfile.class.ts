@@ -4,8 +4,9 @@ import LSP6KeyManagerArtifact from './abi/LSP6KeyManager.json';
 
 import {Permissions, UniversalProfileReader} from "./UniversalProfileReader.class";
 import {generatePermissionKey} from "./utils/generate-permission-key";
+import {ADDRESS0} from "../../utils/address0";
 
-enum ERC725OperationType {
+export enum ERC725XOperationType {
   call,
   create,
   create2,
@@ -20,7 +21,6 @@ export class UniversalProfile extends UniversalProfileReader {
 
   public async initialize() {
     await super.initialize();
-
     this._web3.eth.getAccounts().then(res => {
       this._eoa = res[0];
     });
@@ -33,22 +33,24 @@ export class UniversalProfile extends UniversalProfileReader {
     await this.executeWithKeyManager(bytecode);
   }
 
-  public async execute(type: ERC725OperationType, to: string, value: number, bytecode: string): Promise<any> {
+  public async execute(type: ERC725XOperationType, value: number, bytecode: string, to?: string): Promise<any> {
+    const addressTo = to ? to : ADDRESS0;
     if (this.hasKeyManager()) {
-      const upExecutionBytes = this._contract.methods.execute(type, to, value, bytecode).encodeABI();
+      const upExecutionBytes = this._contract.methods.execute(type , addressTo, value, bytecode).encodeABI();
       return await this.executeWithKeyManager(upExecutionBytes);
     } else {
       const eoa: string = this._eoa;
-      return await this._contract.methods.execute(type, to, value, bytecode).send({eoa});
+      return await this._contract.methods.execute(type, addressTo, value, bytecode).send({eoa});
     }
   }
 
-  public getBytecodeExecution(type: ERC725OperationType, to: string, value: number, bytecode: string): string {
+  public getBytecodeExecution(type: ERC725XOperationType, value: number, bytecode: string, to?: string): string {
+    const addressTo = to ? to : ADDRESS0;
     if (this.hasKeyManager()) {
-      const upExecutionBytes = this._contract.methods.execute(type, to, value, bytecode).encodeABI();
+      const upExecutionBytes = this._contract.methods.execute(type, addressTo, value, bytecode).encodeABI();
       return this.getBytecodeOfExecutionWithKeyManager(upExecutionBytes);
     } else {
-      return this._contract.methods.execute(type, to, value, bytecode).encodeABI();
+      return this._contract.methods.execute(type, addressTo, value, bytecode).encodeABI();
     }
   }
 
