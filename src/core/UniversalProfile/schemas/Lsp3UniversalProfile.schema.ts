@@ -1,5 +1,5 @@
 import { ERC725JSONSchema } from '@erc725/erc725.js';
-export const schema: ERC725JSONSchema[] = [
+export const Lsp3UniversalProfileSchema: ERC725JSONSchema[] = [
     {
         "name": "SupportedStandards:LSP3UniversalProfile",
         "key": "0xeafec4d89fa9619884b60000abe425d64acd861a49b8ddf5c0b6962110481f38",

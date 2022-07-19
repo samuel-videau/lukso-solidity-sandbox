@@ -1,7 +1,7 @@
 import {ERC725} from "@erc725/erc725.js";
 import Web3 from "web3";
 
-import {schema} from './schemas/universal-profiles.schema';
+import {Lsp3UniversalProfileSchema} from './schemas/Lsp3UniversalProfile.schema';
 import {
   initialUniversalProfile,
   LSP3UniversalProfileMetadata
@@ -53,7 +53,7 @@ export class UniversalProfileReader {
   private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
-    this._erc725 = new ERC725(schema, address, web3.currentProvider, {ipfsGateway})
+    this._erc725 = new ERC725(Lsp3UniversalProfileSchema, address, web3.currentProvider, {ipfsGateway})
     this._address = address;
     this._web3 = web3;
     this._contract = new this._web3.eth.Contract(UniversalProfileArtifact.abi as AbiItem[], address);
