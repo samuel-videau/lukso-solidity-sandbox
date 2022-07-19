@@ -19,6 +19,15 @@ UniversalProfileLogTypes.set('0xcdf4e344c0d23d4cdd0474039d176c55b19d531070dbe178
   }
 );
 
+UniversalProfileLogTypes.set('0xece574603820d07bc9b91f2a932baadf4628aabcb8afba49776529c14a6104b2',
+    {name: 'DataChanged', parameters:
+            [
+                {name: 'key', type: 'bytes32', indexed: true},
+                {name: 'value', type: 'bytes', indexed: false},
+            ]
+    }
+);
+
 UniversalProfileLogTypes.set('0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
     {name: 'OwnershipTransferred', parameters:
         [
@@ -45,6 +54,17 @@ UniversalProfileLogTypes.set('0x8187df79ab47ad16102e7bc8760349a115b3ba9869b8cedd
                 {name: 'from', type: 'address', indexed: true},
                 {name: 'typeId', type: 'bytes32', indexed: true},
                 {name: 'returnedValue', type: 'bytes', indexed: true},
+                {name: 'receivedData', type: 'bytes', indexed: false},
+            ]
+    }
+);
+
+UniversalProfileLogTypes.set('0x54b98940949b5ac0325c889c84db302d4e18faec431b48bdc81706bfe482cfbd',
+    {name: 'UniversalReceiver', parameters:
+            [
+                {name: 'from', type: 'address', indexed: true},
+                {name: 'typeId', type: 'bytes32', indexed: true},
+                {name: 'returnedValue', type: 'bytes32', indexed: true},
                 {name: 'receivedData', type: 'bytes', indexed: false},
             ]
     }
