@@ -1,15 +1,16 @@
-import { Link, MetadataImage } from './metadata-objects.model';
+import {Link, MetadataAsset, MetadataImage} from '../../../models/metadata-objects.model';
 
-export interface LSP3UniversalProfileMetadata {
+export interface LSP3UniversalProfile {
     name: string;
     description: string;
     links: Link[];
     tags: string[];
     profileImage: MetadataImage[];
     backgroundImage: MetadataImage[];
+    avatar?: MetadataAsset;
 }
 
-export function initialUniversalProfile(): LSP3UniversalProfileMetadata {
+export function initialUniversalProfile(): LSP3UniversalProfile {
     return {
         name: '',
         description: '',
@@ -18,8 +19,4 @@ export function initialUniversalProfile(): LSP3UniversalProfileMetadata {
         profileImage: [],
         backgroundImage: []
     };
-}
-
-export interface LSP3Profile {
-    LSP3Profile: LSP3UniversalProfileMetadata;
 }
