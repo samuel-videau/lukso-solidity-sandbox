@@ -1,21 +1,19 @@
+import {URLDataWithHash} from "@erc725/erc725.js/build/main/src/types/encodeData/JSONURL";
+import { Subscription } from "web3-core-subscriptions";
 import {ERC725} from "@erc725/erc725.js";
+import {Contract} from "web3-eth-contract";
+import {AbiItem} from "web3-utils";
+import { Log } from "web3-core";
 import Web3 from "web3";
 
-import {Lsp3UniversalProfileSchema} from './schemas/Lsp3UniversalProfile.schema';
-import {
-  initialUniversalProfile,
-  LSP3UniversalProfileMetadata
-} from "./models/lsp3-universal-profile-metadata.model";
-import {URLDataWithHash} from "@erc725/erc725.js/build/main/src/types/encodeData/JSONURL";
-import {Contract} from "web3-eth-contract";
-import UniversalProfileArtifact from "./abi/UniversalProfile.json";
-import {AbiItem} from "web3-utils";
 import {generatePermissionKey} from "./utils/generate-permission-key";
 import {EthLogs} from "../EthLogs/EthLogs.class";
 import {UniversalProfileLogTypes} from "./utils/UniversalProfileLogTypes";
-import { Log } from "web3-core";
-import { Subscription } from "web3-core-subscriptions";
 import {EthLog} from "../EthLogs/EthLog.class";
+
+import {Lsp3UniversalProfileSchema} from './schemas/Lsp3UniversalProfile.schema';
+import UniversalProfileArtifact from "./abi/UniversalProfile.json";
+import {initialUniversalProfile, LSP3UniversalProfile} from "./models/lsp3-universal-profile.model";
 
 interface GetDataDynamicKey {
   keyName: string;
@@ -48,7 +46,7 @@ export class UniversalProfileReader {
   protected readonly _contract: Contract;
 
   protected _web3: Web3;
-  private _metadata: LSP3UniversalProfileMetadata = initialUniversalProfile();
+  private _metadata: LSP3UniversalProfile = initialUniversalProfile();
   private _logs: EthLogs = new EthLogs(UniversalProfileLogTypes);
   private _logsSubscription: Subscription<Log>;
 
@@ -63,7 +61,7 @@ export class UniversalProfileReader {
     });
   }
 
-  get metadata(): LSP3UniversalProfileMetadata {
+  get metadata(): LSP3UniversalProfile {
     return this._metadata;
   }
 
@@ -122,6 +120,6 @@ export class UniversalProfileReader {
 
   private async fetchMetadata() {
     const data = await this._erc725.fetchData(['LSP3Profile']);
-    this._metadata = JSON.parse(JSON.stringify(data[0])).value.LSP3Profile as LSP3UniversalProfileMetadata;
+    this._metadata = JSON.parse(JSON.stringify(data[0])).value.LSP3Profile as LSP3UniversalProfile;
   }
 }
