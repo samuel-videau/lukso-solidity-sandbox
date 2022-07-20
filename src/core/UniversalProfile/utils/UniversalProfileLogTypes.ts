@@ -48,6 +48,17 @@ UniversalProfileLogTypes.set('0x1f920dbda597d7bf95035464170fa58d0a4b57f13a1c315a
     }
 );
 
+UniversalProfileLogTypes.set('0x4810874456b8e6487bd861375cf6abd8e1c8bb5858c8ce36a86a04dabfac199e',
+    {name: 'Executed', parameters:
+            [
+                {name: 'operation', type: 'uint256', indexed: true},
+                {name: 'to', type: 'address', indexed: true},
+                {name: 'value', type: 'uint256', indexed: true},
+                {name: 'selector', type: 'bytes4', indexed: false},
+            ]
+    }
+);
+
 UniversalProfileLogTypes.set('0x8187df79ab47ad16102e7bc8760349a115b3ba9869b8cedd78996f930ac9cac3',
     {name: 'UniversalReceiver', parameters:
             [
