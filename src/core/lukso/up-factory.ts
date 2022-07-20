@@ -1,7 +1,7 @@
 import { LSPFactory } from '@lukso/lsp-factory.js';
 
 declare const window: any;
-const provider = 'https://rpc.l14.lukso.network'; // RPC provider url
+const provider = 'https://rpc.l16.lukso.network'; // RPC provider url
 
 
 const lspFactory = new LSPFactory(window.ethereum);
