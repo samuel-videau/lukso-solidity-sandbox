@@ -3,19 +3,22 @@ import './App.css';
 import {connectProfile, signMessage, web3} from "./core/web3";
 import {deployUP} from "./core/lukso/up-factory";
 import {ERC725XOperationType, UniversalProfile} from "./core/UniversalProfile/UniversalProfile.class";
-import LSP7DigitalAssetInit from "./assets/artifacts/LSP7DigitalAssetInit.json";
+import LSP7Mintable from "@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json";
 import {AbiItem} from "web3-utils";
-import {EthLog} from "./core/EthLogs/EthLog.class";
 import {tryIdentifyingContract} from "./core/contract-identification/identify-contract";
-import {StandardInterface} from "./core/contract-identification/standard-interfaces";
-import {ERC725} from "@erc725/erc725.js";
-import {InterfaceToSchema} from "./core/contract-identification/interface-to-schema";
 import {ADDRESS0} from "./utils/address0";
+import Lsp4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
+import {ERC725, ERC725JSONSchema} from "@erc725/erc725.js";
+import {EncodeDataInput} from "@erc725/erc725.js/build/main/src/types/decodeData";
+import {StandardInterface} from "./core/contract-identification/standard-interfaces";
+import {InterfaceToSchema} from "./core/contract-identification/interface-to-schema";
+import {EthLog} from "./core/EthLogs/EthLog.class";
+
 
 function App() {
 
     async function testUPClass() {
-      const universalProfile = new UniversalProfile("0x65068D4024B0D8dD98a95B560D290BdDB765a03b", 'https://2eff.lukso.dev/ipfs/', web3);
+      const universalProfile = new UniversalProfile("0xA5284665954a54d12737Da405824160cCE05B0B0", 'https://2eff.lukso.dev/ipfs/', web3);
       await universalProfile.initialize();
 
 
@@ -49,13 +52,63 @@ function App() {
         // }, 4000);
 
 
-    // const receipt = await universalProfile.execute(ERC725XOperationType.create, 0, LSP7DigitalAssetInit.bytecode);
-    // console.log(receipt);
+        const LSP7Contract = new web3.eth.Contract(LSP7Mintable.abi as AbiItem[]);
+        //
+        // const bytecode = LSP7Contract.deploy({
+        //     data: LSP7Mintable.bytecode,
+        //     arguments: ['SuperContract', 'SC', universalProfile.address, true]}).encodeABI();
+        //
+        // const receipt = await universalProfile.execute(ERC725XOperationType.create, 0, bytecode, ADDRESS0);
 
-        await universalProfile.execute(ERC725XOperationType.create, 0, LSP7DigitalAssetInit.bytecode, ADDRESS0);
-        const bytecode = (new web3.eth.Contract(LSP7DigitalAssetInit.abi as AbiItem[])).methods.initialize('Test', 'TST', '0x65068D4024B0D8dD98a95B560D290BdDB765a03b', true).encodeABI();
-        const receipt = await universalProfile.execute(ERC725XOperationType.call, 0, bytecode, "0xAba58f6fCBf941AAc45688d97364C10B9FB0f5FA");
-
+        const JSONURL = ERC725.encodeData([
+            {
+                keyName:
+                    'LSP4Metadata',
+                value: {
+                    json: {
+                        LSP4Metadata: {
+                            description: 'The first digial golden pig.',
+                            links: [
+                                { title: 'Twitter', url: 'https://twitter.com/goldenpig123' },
+                                { title: 'goldenpig.org', url: 'https://goldenpig.org' }
+                            ],
+                            icon: [
+                                {
+                                    width: 256,
+                                    height: 256,
+                                    hashFunction: 'keccak256(bytes)',
+                                    hash: '0x01299df007997de92a820c6c2ec1cb2d3f5aa5fc1adf294157de563eba39bb6f',
+                                    url: 'ifps://QmW5cF4r9yWeY1gUCtt7c6v3ve7Fzdg8CKvTS96NU9Uiwr'
+                                }
+                            ],
+                            images: [
+                                [
+                                    {
+                                        width: 1024,
+                                        height: 974,
+                                        hashFunction: 'keccak256(bytes)',
+                                        hash: '0xa9399df007997de92a820c6c2ec1cb2d3f5aa5fc1adf294157de563eba39bb6e',
+                                        url: 'ifps://QmW4wM4r9yWeY1gUCtt7c6v3ve7Fzdg8CKvTS96NU9Uiwr'
+                                    }
+                                ]
+                            ],
+                            assets: [{
+                                hashFunction: 'keccak256(bytes)',
+                                hash: '0x98fe032f81c43426fbcfb21c780c879667a08e2a65e8ae38027d4d61cdfe6f55',
+                                url: 'ifps://QmPJESHbVkPtSaHntNVY5F6JDLW8v69M2d6khXEYGUMn7N',
+                                fileType: 'fbx'
+                            }]
+                        }
+                    },
+                    url: 'ipfs://bafkreibwfjd6ld3k6hcfno6gkxzco62wn6mtbjr2vehnq2plsc7mvernnu',
+                },
+            },
+        ], Lsp4DigitalAssetSchema as ERC725JSONSchema[]);
+        const key = ERC725.encodeKeyName('LSP4Metadata');
+        console.log('here')
+        const bytecode2 = LSP7Contract.methods.setData([key], [JSONURL]).encodeABI();
+        console.log(3)
+        // const receipt2 = await universalProfile.execute(ERC725XOperationType.call, 0, bytecode2, '0x8dDFDDB6B0D7e99464457c274BFDCE7Ce1ef8EA9');
     }
 
 

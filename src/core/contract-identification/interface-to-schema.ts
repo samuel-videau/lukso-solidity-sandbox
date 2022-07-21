@@ -1,15 +1,15 @@
 import { ERC725JSONSchema } from '@erc725/erc725.js';
-import {Lsp3UniversalProfileSchema} from "../UniversalProfile/schemas/Lsp3UniversalProfile.schema";
-import {Lsp4DigitalAssetSchema} from "../UniversalProfile/schemas/Lsp4DigitalAsset.schema";
+import Lsp3UniversalProfileSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
+import Lsp4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
 
 export const InterfaceToSchema: Map<string, ERC725JSONSchema[]> = new Map<string, ERC725JSONSchema[]>();
 
 InterfaceToSchema.set('LSP0',
-   Lsp3UniversalProfileSchema
+   Lsp3UniversalProfileSchema as ERC725JSONSchema[]
 );
 InterfaceToSchema.set('LSP7',
-    Lsp4DigitalAssetSchema
+    Lsp4DigitalAssetSchema as ERC725JSONSchema[]
 );
 InterfaceToSchema.set('LSP8',
-    Lsp4DigitalAssetSchema
+    Lsp4DigitalAssetSchema as ERC725JSONSchema[]
 );

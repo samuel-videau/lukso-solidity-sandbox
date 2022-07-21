@@ -1,6 +1,6 @@
 import {URLDataWithHash} from "@erc725/erc725.js/build/main/src/types/encodeData/JSONURL";
 import { Subscription } from "web3-core-subscriptions";
-import {ERC725} from "@erc725/erc725.js";
+import {ERC725, ERC725JSONSchema} from "@erc725/erc725.js";
 import {Contract} from "web3-eth-contract";
 import {AbiItem} from "web3-utils";
 import { Log } from "web3-core";
@@ -11,7 +11,8 @@ import {EthLogs} from "../EthLogs/EthLogs.class";
 import {UniversalProfileLogTypes} from "./utils/UniversalProfileLogTypes";
 import {EthLog} from "../EthLogs/EthLog.class";
 
-import {Lsp3UniversalProfileSchema} from './schemas/Lsp3UniversalProfile.schema';
+import Lsp3UniversalProfileSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
+
 import UniversalProfileArtifact from "./abi/UniversalProfile.json";
 import {initialUniversalProfile, LSP3UniversalProfile} from "./models/lsp3-universal-profile.model";
 
@@ -51,7 +52,7 @@ export class UniversalProfileReader {
   private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
-    this._erc725 = new ERC725(Lsp3UniversalProfileSchema, address, web3.currentProvider, {ipfsGateway})
+    this._erc725 = new ERC725(Lsp3UniversalProfileSchema as ERC725JSONSchema[], address, web3.currentProvider, {ipfsGateway})
     this._address = address;
     this._web3 = web3;
     this._contract = new this._web3.eth.Contract(UniversalProfileArtifact.abi as AbiItem[], address);

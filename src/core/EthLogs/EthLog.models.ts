@@ -31,7 +31,7 @@ export interface LogData {
   ContractCreated?: ContractCreatedData;
 }
 
-interface ContractCreatedData {
+export interface ContractCreatedData {
   address: string,
   interface: StandardInterface,
   LSP0?: LSP3UniversalProfile,
@@ -40,11 +40,11 @@ interface ContractCreatedData {
     symbol: string,
     supply: number,
     isNFT: boolean,
-    lsp4DigitalAsset: Lsp4DigitalAsset
+    lsp4DigitalAsset?: Lsp4DigitalAsset
   },
   LSP8?: {
     name: string,
     symbol: string,
-    lsp4DigitalAsset: Lsp4DigitalAsset
+    lsp4DigitalAsset?: Lsp4DigitalAsset
   }
 }
