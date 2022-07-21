@@ -5,6 +5,7 @@ import LSP6KeyManagerArtifact from './abi/LSP6KeyManager.json';
 import {Permissions, UniversalProfileReader} from "./UniversalProfileReader.class";
 import {generatePermissionKey} from "./utils/generate-permission-key";
 import {ADDRESS0} from "../../utils/address0";
+import {TransactionData} from "../../models/transaction-data";
 
 export enum ERC725XOperationType {
   call,
@@ -33,14 +34,14 @@ export class UniversalProfile extends UniversalProfileReader {
     await this.executeWithKeyManager(bytecode);
   }
 
-  public async execute(type: ERC725XOperationType, value: number, bytecode: string, to?: string): Promise<any> {
+  public async execute(type: ERC725XOperationType, value: number, bytecode: string, to?: string): Promise<TransactionData> {
     const addressTo = to ? to : ADDRESS0;
     if (this.hasKeyManager()) {
       const upExecutionBytes = this._contract.methods.execute(type , addressTo, value, bytecode).encodeABI();
       return await this.executeWithKeyManager(upExecutionBytes);
     } else {
       const eoa: string = this._eoa;
-      return await this._contract.methods.execute(type, addressTo, value, bytecode).send({eoa});
+      return await this._contract.methods.execute(type, addressTo, value, bytecode).send({eoa}) as TransactionData;
     }
   }
 
@@ -63,10 +64,10 @@ export class UniversalProfile extends UniversalProfileReader {
     this._keyManagerAddress = await this._contract.methods.owner().call();
   }
 
-  private async executeWithKeyManager(bytes: string): Promise<any> {
+  private async executeWithKeyManager(bytes: string): Promise<TransactionData> {
     const contract: Contract = new this._web3.eth.Contract(LSP6KeyManagerArtifact.abi as AbiItem[], this._keyManagerAddress);
     const eoa: string = this._eoa;
-    return await contract.methods.execute(bytes).send({ from: eoa });
+    return await contract.methods.execute(bytes).send({ from: eoa }) as TransactionData;
   }
 
   private getBytecodeOfExecutionWithKeyManager(bytes: string): string {
