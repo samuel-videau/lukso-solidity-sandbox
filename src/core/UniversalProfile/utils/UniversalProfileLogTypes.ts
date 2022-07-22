@@ -4,9 +4,9 @@ export const UniversalProfileLogTypes: HashToSolMethod = new Map<string, SolMeth
 UniversalProfileLogTypes.set('0x01c42bd7e97a66166063b02fce6924e6656b6c2c61966630165095c4fb0b7b2f',
   {name: 'ContractCreated', parameters:
       [
-          {name: '_operation', type: 'uint256', indexed: true},
-          {name: '_contractAddress', type: 'address', indexed: true},
-          {name: '_value', type: 'uin256', indexed: true},
+          {name: 'operation', type: 'uint256', indexed: true},
+          {name: 'contractAddress', type: 'address', indexed: true},
+          {name: 'value', type: 'uin256', indexed: true},
       ]
   }
 );
@@ -40,10 +40,10 @@ UniversalProfileLogTypes.set('0x8be0079c531659141344cd1fd0a4f28419497f9722a3daaf
 UniversalProfileLogTypes.set('0x1f920dbda597d7bf95035464170fa58d0a4b57f13a1c315ace6793b9f63688b8',
     {name: 'Executed', parameters:
         [
-            {name: '_operation', type: 'uint256', indexed: true},
-            {name: '_to', type: 'address', indexed: true},
-            {name: '_value', type: 'uint256', indexed: true},
-            {name: '_data', type: 'bytes', indexed: false},
+            {name: 'operation', type: 'uint256', indexed: true},
+            {name: 'to', type: 'address', indexed: true},
+            {name: 'value', type: 'uint256', indexed: true},
+            {name: 'data', type: 'bytes', indexed: false},
         ]
     }
 );
