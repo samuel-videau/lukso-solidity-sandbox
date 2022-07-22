@@ -1,22 +1,13 @@
+import Web3 from "web3";
+
 import {
-  ContractCreatedData,
   HashToSolMethod,
   Log,
-  ExtractedLogData, LSP7Data,
+  ExtractedLogData,
   SolMethod,
-  SolParameterWithValue,
-  UnknownSolMethod
+  SolParameterWithValue, UnknownSolMethod,
 } from "./EthLog.models";
-import Web3 from "web3";
-import {StandardInterface} from "../contract-identification/standard-interfaces";
-import {tryIdentifyingContract} from "../contract-identification/identify-contract";
-import {LSP4DigitalAsset} from "../UniversalProfile/models/lsp4-digital-asset.model";
-import LSP4DigitalAssetJSON from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
-import LSP3UniversalProfileJSON from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
-import ERC725, {ERC725JSONSchema} from "@erc725/erc725.js";
-import LSP7DigitalAsset from "@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json";
-import {AbiItem} from "web3-utils";
-import {initialUniversalProfile, LSP3UniversalProfile} from "../UniversalProfile/models/lsp3-universal-profile.model";
+import {extractContractCreatedData} from "./data-extracting/extract-log-data";
 
 
 export class EthLog {
@@ -59,67 +50,11 @@ export class EthLog {
     if (this._extractedData.extracted) return this._extractedData;
     switch (this._method.name) {
       case 'ContractCreated':
-        this._extractedData.ContractCreated = await this.extractContractCreatedData();
+        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters[1].value, this._web3);
         break;
     }
     this._extractedData.extracted = true;
     return this._extractedData;
-  }
-
-  private async extractContractCreatedData(): Promise<ContractCreatedData> {
-    const contractAddress = this.parameters[1].value;
-    const contractInterface: StandardInterface = await tryIdentifyingContract(contractAddress, this._web3);
-    const data = {address: contractAddress, interface: contractInterface};
-
-    switch (contractInterface.code) {
-      case 'LSP8':
-        return {LSP8: await this.extractLSP4Data(contractAddress), ...data};
-      case 'LSP7':
-        return {LSP7: await this.extractLSP7Data(contractAddress), ...data};
-      case 'LSP0':
-        return {LSP0: await this.extractLSP3Data(contractAddress), ...data};
-      default:
-        return data;
-    }
-  }
-
-  private async extractLSP7Data(address: string): Promise<LSP7Data> {
-    const lsp4Data: LSP4DigitalAsset = await this.extractLSP4Data(address);
-    const lsp7contract = new this._web3.eth.Contract(LSP7DigitalAsset.abi as AbiItem[], address);
-    const isNFT: boolean = (await lsp7contract.methods.decimals().call()) === '0';
-    const supply: number = await lsp7contract.methods.totalSupply().call();
-    return {isNFT, supply, ...lsp4Data};
-  }
-
-  private async extractLSP4Data(address: string): Promise<LSP4DigitalAsset> {
-    const erc725Y = new ERC725(LSP4DigitalAssetJSON as ERC725JSONSchema[], address, this._web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
-    let lsp4Metadata, data;
-
-    try {
-      data = await erc725Y.getData(['LSP4TokenName', 'LSP4TokenSymbol']);
-      lsp4Metadata = await erc725Y.fetchData('LSP4Metadata');
-    } catch (e) {
-      lsp4Metadata = {value: null};
-    }
-
-    return {
-      name: data && data[0].value ? data[0].value as string: '',
-      symbol: data && data[1].value ? data[1].value as string: '',
-      metadata: lsp4Metadata.value ? (lsp4Metadata.value as any).LSP4Metadata : null,
-    }
-  }
-
-  private async extractLSP3Data(address: string): Promise<LSP3UniversalProfile> {
-    const erc725Y = new ERC725(LSP3UniversalProfileJSON as ERC725JSONSchema[], address, this._web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
-    let lsp3Profile;
-
-    try {
-      lsp3Profile = await erc725Y.fetchData('LSP3Profile');
-    } catch (e) {
-      lsp3Profile = {value: null};
-    }
-
-    return lsp3Profile.value ? (lsp3Profile.value as any).LSP3Profile as LSP3UniversalProfile : initialUniversalProfile();
   }
 }
 
