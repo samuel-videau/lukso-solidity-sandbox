@@ -12,9 +12,11 @@ import {StandardInterface} from "../contract-identification/standard-interfaces"
 import {tryIdentifyingContract} from "../contract-identification/identify-contract";
 import {LSP4DigitalAsset} from "../UniversalProfile/models/lsp4-digital-asset.model";
 import LSP4DigitalAssetJSON from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
+import LSP3UniversalProfileJSON from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
 import ERC725, {ERC725JSONSchema} from "@erc725/erc725.js";
 import LSP7DigitalAsset from "@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json";
 import {AbiItem} from "web3-utils";
+import {initialUniversalProfile, LSP3UniversalProfile} from "../UniversalProfile/models/lsp3-universal-profile.model";
 
 
 export class EthLog {
@@ -74,6 +76,8 @@ export class EthLog {
         return {LSP8: await this.extractLSP4Data(contractAddress), ...data};
       case 'LSP7':
         return {LSP7: await this.extractLSP7Data(contractAddress), ...data};
+      case 'LSP0':
+        return {LSP0: await this.extractLSP3Data(contractAddress), ...data};
       default:
         return data;
     }
@@ -89,20 +93,33 @@ export class EthLog {
 
   private async extractLSP4Data(address: string): Promise<LSP4DigitalAsset> {
     const erc725Y = new ERC725(LSP4DigitalAssetJSON as ERC725JSONSchema[], address, this._web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
-    const data = await erc725Y.getData(['LSP4TokenName', 'LSP4TokenSymbol']);
-    let lsp4Metadata;
+    let lsp4Metadata, data;
 
     try {
+      data = await erc725Y.getData(['LSP4TokenName', 'LSP4TokenSymbol']);
       lsp4Metadata = await erc725Y.fetchData('LSP4Metadata');
     } catch (e) {
       lsp4Metadata = {value: null};
     }
 
     return {
-      name: data[0].value as string,
-      symbol: data[1].value as string,
+      name: data && data[0].value ? data[0].value as string: '',
+      symbol: data && data[1].value ? data[1].value as string: '',
       metadata: lsp4Metadata.value ? (lsp4Metadata.value as any).LSP4Metadata : null,
     }
+  }
+
+  private async extractLSP3Data(address: string): Promise<LSP3UniversalProfile> {
+    const erc725Y = new ERC725(LSP3UniversalProfileJSON as ERC725JSONSchema[], address, this._web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
+    let lsp3Profile;
+
+    try {
+      lsp3Profile = await erc725Y.fetchData('LSP3Profile');
+    } catch (e) {
+      lsp3Profile = {value: null};
+    }
+
+    return lsp3Profile.value ? (lsp3Profile.value as any).LSP3Profile as LSP3UniversalProfile : initialUniversalProfile();
   }
 }
 
