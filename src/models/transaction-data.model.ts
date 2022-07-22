@@ -1,4 +1,4 @@
-import {EventData} from "./event-data";
+import {EventData} from "./event-data.model";
 
 export interface TransactionData {
     events: EventData[];
