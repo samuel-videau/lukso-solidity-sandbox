@@ -17,8 +17,7 @@ export class EthLogs {
     const method = this.solMethodsHashesRepo.get(log.topics[0]) ? this.solMethodsHashesRepo.get(log.topics[0]) as SolMethod : UnknownSolMethod;
     const logObject = new EthLog(log, this.provider, {method});
     this.ethLogs.push(logObject);
-    const data = await logObject.extractData();
-    console.log(data);
+    await logObject.extractData();
   }
 
   public getLogs() {

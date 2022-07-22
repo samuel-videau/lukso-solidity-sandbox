@@ -27,7 +27,7 @@ export interface SolMethod{
 
 export const UnknownSolMethod: SolMethod = {name: 'Unknown', parameters: []};
 
-export interface LogData {
+export interface ExtractedLogData {
   extracted: boolean,
   ContractCreated?: ContractCreatedData;
 }

@@ -2,7 +2,7 @@ import {
   ContractCreatedData,
   HashToSolMethod,
   Log,
-  LogData, LSP7Data,
+  ExtractedLogData, LSP7Data,
   SolMethod,
   SolParameterWithValue,
   UnknownSolMethod
@@ -19,50 +19,54 @@ import {AbiItem} from "web3-utils";
 
 export class EthLog {
 
-  private readonly web3: Web3;
-  private readonly log: Log;
-  private readonly method: SolMethod = UnknownSolMethod;
-  private readonly decodedParameters;
+  private readonly _web3: Web3;
+  private readonly _log: Log;
+  private readonly _method: SolMethod = UnknownSolMethod;
+  private readonly _decodedParameters;
 
-  private logData: LogData = { extracted: false };
+  private _extractedData: ExtractedLogData = { extracted: false };
 
   constructor(log: Log, provider: string, method: {method?: SolMethod, hashToSolMethod?: HashToSolMethod}) {
-    this.log = log;
-    this.web3 = new Web3(provider);
+    this._log = log;
+    this._web3 = new Web3(provider);
     if (method.method) {
-      this.method = method.method;
+      this._method = method.method;
     } else if (method.hashToSolMethod) {
-      this.method = method.hashToSolMethod.get(log.topics[0]) ? method.hashToSolMethod.get(log.topics[0]) as SolMethod : UnknownSolMethod;
+      this._method = method.hashToSolMethod.get(log.topics[0]) ? method.hashToSolMethod.get(log.topics[0]) as SolMethod : UnknownSolMethod;
     }
-    this.decodedParameters = this.method.name === 'unknown' ? {} : this.web3.eth.abi.decodeLog(this.method.parameters, log.data, log.topics.filter((x, i) => i !== 0));
+    this._decodedParameters = this._method.name === 'unknown' ? {} : this._web3.eth.abi.decodeLog(this._method.parameters, log.data, log.topics.filter((x, i) => i !== 0));
   }
 
-  public getName(): string {
-    return this.method.name;
+  get name(): string {
+    return this._method.name;
   }
 
-  public getLog(): Log {
-    return this.log;
+  get log(): Log {
+    return this._log;
   }
 
-  public getParameters(): SolParameterWithValue[] {
-    return this.method.parameters.map((x) => {return {...x, value: this.decodedParameters[x.name]}});
+  get parameters(): SolParameterWithValue[] {
+    return this._method.parameters.map((x) => {return {...x, value: this._decodedParameters[x.name]}});
   }
 
-  public async extractData(): Promise<LogData> {
-    if (this.logData.extracted) return this.logData;
-    switch (this.method.name) {
+  get extractedData(): ExtractedLogData {
+    return this._extractedData;
+  }
+
+  public async extractData(): Promise<ExtractedLogData> {
+    if (this._extractedData.extracted) return this._extractedData;
+    switch (this._method.name) {
       case 'ContractCreated':
-        this.logData.ContractCreated = await this.extractContractCreatedData();
+        this._extractedData.ContractCreated = await this.extractContractCreatedData();
         break;
     }
-    this.logData.extracted = true;
-    return this.logData;
+    this._extractedData.extracted = true;
+    return this._extractedData;
   }
 
   private async extractContractCreatedData(): Promise<ContractCreatedData> {
-    const contractAddress = this.getParameters()[1].value;
-    const contractInterface: StandardInterface = await tryIdentifyingContract(contractAddress, this.web3);
+    const contractAddress = this.parameters[1].value;
+    const contractInterface: StandardInterface = await tryIdentifyingContract(contractAddress, this._web3);
     const data = {address: contractAddress, interface: contractInterface};
 
     switch (contractInterface.code) {
@@ -77,14 +81,14 @@ export class EthLog {
 
   private async extractLSP7Data(address: string): Promise<LSP7Data> {
     const lsp4Data: LSP4DigitalAsset = await this.extractLSP4Data(address);
-    const lsp7contract = new this.web3.eth.Contract(LSP7DigitalAsset.abi as AbiItem[], address);
+    const lsp7contract = new this._web3.eth.Contract(LSP7DigitalAsset.abi as AbiItem[], address);
     const isNFT: boolean = (await lsp7contract.methods.decimals().call()) === '0';
     const supply: number = await lsp7contract.methods.totalSupply().call();
     return {isNFT, supply, ...lsp4Data};
   }
 
   private async extractLSP4Data(address: string): Promise<LSP4DigitalAsset> {
-    const erc725Y = new ERC725(LSP4DigitalAssetJSON as ERC725JSONSchema[], address, this.web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
+    const erc725Y = new ERC725(LSP4DigitalAssetJSON as ERC725JSONSchema[], address, this._web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
     const data = await erc725Y.getData(['LSP4TokenName', 'LSP4TokenSymbol']);
     let lsp4Metadata;
 
