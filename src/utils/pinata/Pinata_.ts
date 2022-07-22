@@ -1,5 +1,4 @@
 import pinataKey from "./pinataKey.json"
-const fs = require("fs");
 
 export const Pinata = {
     async testPinata() {

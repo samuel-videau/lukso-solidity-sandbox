@@ -14,7 +14,8 @@ import {StandardInterface} from "./core/contract-identification/standard-interfa
 import {InterfaceToSchema} from "./core/contract-identification/interface-to-schema";
 import {EthLog} from "./core/EthLogs/EthLog.class";
 import {testPinata, pinFile} from "./utils/pinata/pinata";
-import Post from './components/post';
+import Post from './components/Post';
+import NetworkDashboard from './components/NetworkDashboard';
 
 
 function App() {
@@ -131,6 +132,7 @@ function App() {
             <button onClick={async() => {
                 console.log(await tryIdentifyingContract('0xb9379550535F90966d6252414077D95Fc761499A', web3)) }}>Identify Contract</button>
             <Post />
+            <NetworkDashboard />
         </div>
     );
 }

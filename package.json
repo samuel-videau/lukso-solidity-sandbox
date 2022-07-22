@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@bundlr-network/client": "^0.7.15",
     "@erc725/erc725.js": "^0.14.3",
     "@lukso/lsp-factory.js": "^2.3.2",
     "@lukso/lsp-smart-contracts": "^0.6.2",
