@@ -7,7 +7,7 @@ import {
   SolMethod,
   SolParameterWithValue, UnknownSolMethod,
 } from "./EthLog.models";
-import {extractContractCreatedData} from "./data-extracting/extract-log-data";
+import {extractContractCreatedData, extractExecutedData} from "./data-extracting/extract-log-data";
 
 
 export class EthLog {
@@ -50,7 +50,10 @@ export class EthLog {
     if (this._extractedData.extracted) return this._extractedData;
     switch (this._method.name) {
       case 'ContractCreated':
-        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters[1].value, this._web3);
+        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters, this._web3);
+        break;
+      case 'Executed':
+        this._extractedData.Executed = await extractExecutedData(this.parameters);
         break;
     }
     this._extractedData.extracted = true;

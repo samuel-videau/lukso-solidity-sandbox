@@ -11,4 +11,4 @@ export const standardInterfaces: StandardInterface[] = [
     {id: '0x49399145', code: 'LSP8', name: 'Identifiable Digital Asset'}
 ];
 
-export const UNKNOWN_INTERFACE: StandardInterface = {id: '0x', name: 'Unknown', code: 'Unknown'}
+export const UNKNOWN_CONTRACT_INTERFACE: StandardInterface = {id: '0x', name: 'Unknown', code: 'Unknown'}
