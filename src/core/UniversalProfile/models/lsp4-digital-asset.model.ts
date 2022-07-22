@@ -1,6 +1,12 @@
 import {Link, MetadataAsset, MetadataImage} from '../../../models/metadata-objects.model';
 
-export interface Lsp4DigitalAsset {
+export interface LSP4DigitalAsset {
+    name: string,
+    symbol: string,
+    metadata: LSP4DigitalAssetMetadata
+}
+
+export interface LSP4DigitalAssetMetadata {
     description: string;
     links: Link[];
     icon: MetadataAsset;
@@ -8,7 +14,7 @@ export interface Lsp4DigitalAsset {
     assets: MetadataAsset[];
 }
 
-export function initialUniversalProfile(): Lsp4DigitalAsset {
+export function initialDigitalAssetMetadata(): LSP4DigitalAssetMetadata {
     return {
         description: '',
         links: [],
