@@ -1,4 +1,6 @@
 import { LSPFactory } from '@lukso/lsp-factory.js';
+import { getActiveEOA } from '../../utils/active-eoa';
+import { web3 } from '../web3';
 
 declare const window: any;
 const provider = 'https://rpc.l16.lukso.network'; // RPC provider url
@@ -39,8 +41,11 @@ const myLSP3MetaData = {
 };
 
 export async function deployUP() {
+
+  const eoa = await getActiveEOA(web3);
+
   const myContracts = await lspFactory.UniversalProfile.deploy({
-    controllerAddresses: ['0xD692Ba892a902810a2EE3fA41C1D8DcD652D47Ab'],
+    controllerAddresses: [eoa],
     lsp3Profile: myLSP3MetaData
   });
 
