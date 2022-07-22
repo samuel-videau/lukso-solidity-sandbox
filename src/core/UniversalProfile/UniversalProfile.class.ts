@@ -5,7 +5,7 @@ import LSP6KeyManagerArtifact from './abi/LSP6KeyManager.json';
 import {Permissions, UniversalProfileReader} from "./UniversalProfileReader.class";
 import {generatePermissionKey} from "./utils/generate-permission-key";
 import {ADDRESS0} from "../../utils/address0";
-import {TransactionData} from "../../models/transaction-data";
+import {TransactionData} from "../../models/transaction-data.model";
 
 export enum ERC725XOperationType {
   call,

@@ -48,7 +48,7 @@ export class UniversalProfileReader {
 
   protected _web3: Web3;
   private _metadata: LSP3UniversalProfile = initialUniversalProfile();
-  private _logs: EthLogs = new EthLogs(UniversalProfileLogTypes);
+  private _logs: EthLogs = new EthLogs(UniversalProfileLogTypes, 'https://rpc.l16.lukso.network');
   private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
@@ -106,7 +106,7 @@ export class UniversalProfileReader {
       if (error) {
         await this._logsSubscription.unsubscribe();
       } else if (res.transactionHash) {
-        this._logs.addLog(res);
+        await this._logs.addLog(res);
       }
     })
   }
