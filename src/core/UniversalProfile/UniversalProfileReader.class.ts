@@ -74,7 +74,7 @@ export class UniversalProfileReader {
     await this.fetchMetadata();
   }
 
-  public async getData(keys: (string | GetDataDynamicKey)[]): Promise<DecodeDataOutput[]> {
+  public async getData(keys?: (string | GetDataDynamicKey)[]): Promise<DecodeDataOutput[]> {
     return await this._erc725.getData(keys);
   }
 
@@ -82,7 +82,7 @@ export class UniversalProfileReader {
     return await this._contract.methods.getData(keys).call();
   }
 
-  public async fetchData(keys: (string | GetDataDynamicKey)[]): Promise<DecodeDataOutput[]> {
+  public async fetchData(keys?: (string | GetDataDynamicKey)[]): Promise<DecodeDataOutput[]> {
     return await this._erc725.fetchData(keys);
   }
 
