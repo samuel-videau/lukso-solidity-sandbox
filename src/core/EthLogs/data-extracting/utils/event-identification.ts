@@ -24,14 +24,6 @@ const eventsRepo: SolEvent[] = [
                 {name: 'newOwner', type: 'address', indexed: true},
             ]
     },
-    {name: 'Executed', topic: '0x1f920dbda597d7bf95035464170fa58d0a4b57f13a1c315ace6793b9f63688b8', parameters:
-            [
-                {name: 'operation', type: 'uint256', indexed: true},
-                {name: 'to', type: 'address', indexed: true},
-                {name: 'value', type: 'uint256', indexed: true},
-                {name: 'data', type: 'bytes', indexed: false},
-            ]
-    },
     {name: 'Executed', topic: '0x4810874456b8e6487bd861375cf6abd8e1c8bb5858c8ce36a86a04dabfac199e', parameters:
             [
                 {name: 'operation', type: 'uint256', indexed: true},
