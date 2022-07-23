@@ -1,7 +1,6 @@
 import Web3 from "web3";
 
 import {
-    ContractCreatedData,
     ContractData,
     DataChangedData,
     ExecutedData,
@@ -44,11 +43,10 @@ export async function extractExecutedEventData(address: string, value: number, s
     const methodInterface: MethodInterface | undefined = methodIdToInterface.get(selector);
     if (methodInterface) {
         data.interface = methodInterface;
-        if (data.interface.associatedTopics && data.interface.associatedTopics.length > 0) {
-            const transaction = await web3.eth.getTransactionReceipt(transactionHash);
-            for (const log of transaction.logs) {
-                if (data.interface.associatedTopics.includes(log.topics[0])) await data.logs.addLog(log);
-            }
+        const transaction = await web3.eth.getTransactionReceipt(transactionHash);
+        for (const log of transaction.logs) {
+            // We don't add the Executed events/logs, so we avoid infinite recursive loop
+            if (!log.topics[0].includes('0x48108744') && !log.topics[0].includes('0x6b934045')) await data.logs.addLog(log);
         }
     }
 
