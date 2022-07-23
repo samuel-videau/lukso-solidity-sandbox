@@ -1,6 +1,6 @@
 import Web3 from "web3";
 
-import {ContractCreatedData, ExecutedData, SolParameterWithValue} from "../EthLog.models";
+import {ContractCreatedData, DataChangedData, ExecutedData, SolParameterWithValue} from "../EthLog.models";
 import {tryIdentifyingContract} from "./utils/contract-identification/identify-contract";
 
 import {extractLSP7Data} from "./contract-created/extract-lsp7-data";
@@ -11,7 +11,7 @@ import {
     methodIdToInterface,
     MethodInterface,
     UNKNOWN_METHOD_INTERFACE
-} from "./utils/method-identification/method-interfaces";
+} from "./utils/method-interfaces";
 
 export async function extractContractCreatedData(parameters: SolParameterWithValue[], web3: Web3): Promise<ContractCreatedData> {
     const data: ContractCreatedData = {address: parameters[1].value, value: parseInt(parameters[2].value), interface: UNKNOWN_CONTRACT_INTERFACE};
@@ -37,3 +37,6 @@ export async function extractExecutedData(parameters: SolParameterWithValue[]): 
     }
     return data;
 }
+
+
+

@@ -1,7 +1,4 @@
 import Web3 from 'web3';
-import {HashToSolMethod, SolMethod} from "./EthLogs/EthLog.models";
-import {EthLogs} from "./EthLogs/EthLogs.class";
-import {EthLog} from "./EthLogs/EthLog.class";
 
 declare const window: any;
 

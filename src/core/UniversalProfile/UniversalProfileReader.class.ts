@@ -8,13 +8,13 @@ import Web3 from "web3";
 
 import {generatePermissionKey} from "./utils/generate-permission-key";
 import {EthLogs} from "../EthLogs/EthLogs.class";
-import {UniversalProfileLogTypes} from "./utils/UniversalProfileLogTypes";
 import {EthLog} from "../EthLogs/EthLog.class";
 
 import Lsp3UniversalProfileSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
 
 import UniversalProfileArtifact from "./abi/UniversalProfile.json";
 import {initialUniversalProfile, LSP3UniversalProfile} from "./models/lsp3-universal-profile.model";
+import {topicToEvent} from "../EthLogs/data-extracting/utils/event-identification";
 
 interface GetDataDynamicKey {
   keyName: string;
@@ -48,7 +48,7 @@ export class UniversalProfileReader {
 
   protected _web3: Web3;
   private _metadata: LSP3UniversalProfile = initialUniversalProfile();
-  private _logs: EthLogs = new EthLogs(UniversalProfileLogTypes, 'https://rpc.l16.lukso.network');
+  private _logs: EthLogs = new EthLogs(topicToEvent, 'https://rpc.l16.lukso.network');
   private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
