@@ -1,5 +1,5 @@
 import {EthLog} from "./EthLog.class";
-import {Log, SolEvent, UnknownSolEvent} from "./EthLog.models";
+import {Log, SolEvent, UNKNOWN_SOL_EVENT} from "./EthLog.models";
 
 export class EthLogs {
 
@@ -14,7 +14,7 @@ export class EthLogs {
   }
 
   public async addLog(log: Log) {
-    const method = this.solEventsRepo.get(log.topics[0]) ? this.solEventsRepo.get(log.topics[0]) as SolEvent : UnknownSolEvent;
+    const method = this.solEventsRepo.get(log.topics[0]) ? this.solEventsRepo.get(log.topics[0]) as SolEvent : UNKNOWN_SOL_EVENT;
     const logObject = new EthLog(log, this.provider, {method});
     this.ethLogs.push(logObject);
     await logObject.extractData();

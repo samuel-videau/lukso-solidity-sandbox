@@ -26,7 +26,7 @@ export interface SolEvent{
   parameters: AbiInput[];
 }
 
-export const UnknownSolEvent: SolEvent = {name: 'Unknown', topic: '0x', parameters: []};
+export const UNKNOWN_SOL_EVENT: SolEvent = {name: 'Unknown', topic: '0x', parameters: []};
 
 export interface ExtractedLogData {
   extracted: boolean,

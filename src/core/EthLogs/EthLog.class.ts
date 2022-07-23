@@ -3,7 +3,7 @@ import Web3 from "web3";
 import {
   Log,
   ExtractedLogData,
-  SolParameterWithValue, SolEvent, UnknownSolEvent,
+  SolParameterWithValue, SolEvent, UNKNOWN_SOL_EVENT,
 } from "./EthLog.models";
 import {extractContractCreatedData, extractExecutedData} from "./data-extracting/extract-log-data";
 
@@ -12,7 +12,7 @@ export class EthLog {
 
   private readonly _web3: Web3;
   private readonly _log: Log;
-  private readonly _event: SolEvent = UnknownSolEvent;
+  private readonly _event: SolEvent = UNKNOWN_SOL_EVENT;
   private readonly _decodedParameters;
 
   private _extractedData: ExtractedLogData = { extracted: false };
@@ -23,7 +23,7 @@ export class EthLog {
     if (method.method) {
       this._event = method.method;
     } else if (method.hashToSolMethod) {
-      this._event = method.hashToSolMethod.get(log.topics[0]) ? method.hashToSolMethod.get(log.topics[0]) as SolEvent : UnknownSolEvent;
+      this._event = method.hashToSolMethod.get(log.topics[0]) ? method.hashToSolMethod.get(log.topics[0]) as SolEvent : UNKNOWN_SOL_EVENT;
     }
     this._decodedParameters = this._event.name === 'unknown' ? {} : this._web3.eth.abi.decodeLog(this._event.parameters, log.data, log.topics.filter((x, i) => i !== 0));
   }
