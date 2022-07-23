@@ -34,7 +34,7 @@ export class UniversalProfile extends UniversalProfileReader {
     await this.executeWithKeyManager(bytecode);
   }
 
-  public async execute(type: ERC725XOperationType, value: number, bytecode: string, to?: string): Promise<TransactionData> {
+  public async execute(type: ERC725XOperationType, value: string, bytecode: string, to?: string): Promise<TransactionData> {
     const addressTo = to ? to : ADDRESS0;
     if (this.hasKeyManager()) {
       const upExecutionBytes = this._contract.methods.execute(type , addressTo, value, bytecode).encodeABI();
@@ -45,7 +45,7 @@ export class UniversalProfile extends UniversalProfileReader {
     }
   }
 
-  public getBytecodeExecution(type: ERC725XOperationType, value: number, bytecode: string, to?: string): string {
+  public getBytecodeExecution(type: ERC725XOperationType, value: string, bytecode: string, to?: string): string {
     const addressTo = to ? to : ADDRESS0;
     if (this.hasKeyManager()) {
       const upExecutionBytes = this._contract.methods.execute(type, addressTo, value, bytecode).encodeABI();
