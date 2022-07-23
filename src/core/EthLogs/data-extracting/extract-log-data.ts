@@ -15,8 +15,8 @@ import {topicToEvent} from "./utils/event-identification";
 import {keyToERC725YSchema} from "./utils/erc725YSchema-identification";
 import {ERC725, ERC725JSONSchema} from "@erc725/erc725.js";
 
-export async function extractContractCreatedData(parameters: SolParameterWithValue[], web3: Web3): Promise<ContractCreatedData> {
-    const data: ContractCreatedData = {address: parameters[1].value, value: parseInt(parameters[2].value)};
+export async function extractContractCreatedData(address: string, value: number, web3: Web3): Promise<ContractCreatedData> {
+    const data: ContractCreatedData = {address, value};
     data.interface = await tryIdentifyingContract(data.address, web3);
     if (!data.interface) return data;
 
@@ -32,20 +32,23 @@ export async function extractContractCreatedData(parameters: SolParameterWithVal
     }
 }
 
-export async function extractExecutedData(parameters: SolParameterWithValue[], transactionHash: string, web3: Web3): Promise<ExecutedData> {
-    const data: ExecutedData = {address: parameters[1].value, value: parseInt(parameters[2].value), logs: new EthLogs(topicToEvent, web3.currentProvider)};
-    if (parameters[3].name === 'selector') {
-        const methodInterface: MethodInterface | undefined = methodIdToInterface.get(parameters[3].value);
-        if (methodInterface) {
-            data.interface = methodInterface;
-            if (data.interface.associatedTopics && data.interface.associatedTopics.length > 0) {
-                const transaction = await web3.eth.getTransactionReceipt(transactionHash);
-                for (const log of transaction.logs) {
-                    if (data.interface.associatedTopics.includes(log.topics[0])) await data.logs.addLog(log);
-                }
+export async function extractExecutedData(address: string, value: number, selector: string, transactionHash: string, web3: Web3): Promise<ExecutedData> {
+    const data: ExecutedData = {address, value, contract: {}, logs: new EthLogs(topicToEvent, web3.currentProvider)};
+
+    const methodInterface: MethodInterface | undefined = methodIdToInterface.get(selector);
+    if (methodInterface) {
+        data.interface = methodInterface;
+        if (data.interface.associatedTopics && data.interface.associatedTopics.length > 0) {
+            const transaction = await web3.eth.getTransactionReceipt(transactionHash);
+            for (const log of transaction.logs) {
+                if (data.interface.associatedTopics.includes(log.topics[0])) await data.logs.addLog(log);
             }
         }
     }
+
+    const contractData: ContractCreatedData = await extractContractCreatedData(address, value, web3);
+    data.contract = {...contractData};
+
     return data;
 }
 

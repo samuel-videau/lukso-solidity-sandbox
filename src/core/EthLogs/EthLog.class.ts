@@ -52,10 +52,10 @@ export class EthLog {
     if (this._extractedData.extracted) return this._extractedData;
     switch (this._event.name) {
       case 'ContractCreated':
-        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters, this._web3);
+        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters[1].value, parseInt(this.parameters[2].value), this._web3);
         break;
       case 'Executed':
-        this._extractedData.Executed = await extractExecutedData(this.parameters, this.log.transactionHash, this._web3);
+        this._extractedData.Executed = await extractExecutedData(this.parameters[1].value, parseInt(this.parameters[2].value), this.parameters[3].value, this.log.transactionHash, this._web3);
         break;
       case 'DataChanged':
         this._extractedData.DataChanged = await extractDataChangedData(this.log.address ,this.parameters, this._web3);

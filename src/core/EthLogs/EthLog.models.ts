@@ -45,16 +45,22 @@ export interface DataChangedData {
 }
 
 export interface ExecutedData {
-  address: string,
-  interface?: MethodInterface,
-  value: number,
-  logs: EthLogs
+  address: string;
+  interface?: MethodInterface;
+  contract: StandardsData & {
+    interface?: StandardInterface,
+  };
+  value: number;
+  logs: EthLogs;
 }
 
-export interface ContractCreatedData {
+export interface ContractCreatedData extends StandardsData {
   address: string,
   interface?: StandardInterface,
   value: number,
+}
+
+export interface StandardsData {
   LSP0?: LSP3UniversalProfile,
   LSP7?: LSP7Data,
   LSP8?: LSP4DigitalAsset
