@@ -35,7 +35,17 @@ export interface ExtractedLogData {
   ContractCreated?: ContractCreatedData;
   Executed?: ExecutedData;
   DataChanged?: DataChangedData;
+  OwnershipTransferred?: OwnershipTransferredData;
+  ValueReceived?: ValueReceivedData;
+}
 
+export interface ValueReceivedData {
+  sender: ContractData;
+}
+
+export interface OwnershipTransferredData {
+  previousOwner: ContractData;
+  newOwner: ContractData;
 }
 
 export interface DataChangedData {

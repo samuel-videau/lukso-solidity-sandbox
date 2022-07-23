@@ -61,6 +61,17 @@ export class EthLog {
       case 'DataChanged':
         this._extractedData.DataChanged = await extractDataChangedEventData(this.log.address ,this.parameters, this._web3);
         break;
+      case 'OwnershipTransferred':
+        this._extractedData.OwnershipTransferred = {
+          previousOwner: await extractContractData(this.parameters[0].value, this._web3),
+          newOwner: await extractContractData(this.parameters[1].value, this._web3)
+        }
+        break;
+      case 'ValueReceived':
+        this._extractedData.ValueReceived = {
+          sender: await extractContractData(this.parameters[0].value, this._web3),
+        }
+        break;
     }
     this._extractedData.extracted = true;
     return this._extractedData;
