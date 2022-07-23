@@ -1,6 +1,12 @@
 import Web3 from "web3";
 
-import {ContractCreatedData, DataChangedData, ExecutedData, SolParameterWithValue} from "../EthLog.models";
+import {
+    ContractCreatedData,
+    ContractData,
+    DataChangedData,
+    ExecutedData,
+    SolParameterWithValue
+} from "../EthLog.models";
 import {tryIdentifyingContract} from "./utils/contract-identification/identify-contract";
 
 import {extractLSP7Data} from "./contract-created/extract-lsp7-data";
@@ -15,8 +21,8 @@ import {topicToEvent} from "./utils/event-identification";
 import {keyToERC725YSchema} from "./utils/erc725YSchema-identification";
 import {ERC725, ERC725JSONSchema} from "@erc725/erc725.js";
 
-export async function extractContractCreatedData(address: string, value: number, web3: Web3): Promise<ContractCreatedData> {
-    const data: ContractCreatedData = {address, value};
+export async function extractContractData(address: string, web3: Web3): Promise<ContractData> {
+    const data: ContractData = {address};
     data.interface = await tryIdentifyingContract(data.address, web3);
     if (!data.interface) return data;
 
@@ -32,7 +38,7 @@ export async function extractContractCreatedData(address: string, value: number,
     }
 }
 
-export async function extractExecutedData(address: string, value: number, selector: string, transactionHash: string, web3: Web3): Promise<ExecutedData> {
+export async function extractExecutedEventData(address: string, value: number, selector: string, transactionHash: string, web3: Web3): Promise<ExecutedData> {
     const data: ExecutedData = {address, value, contract: {}, logs: new EthLogs(topicToEvent, web3.currentProvider)};
 
     const methodInterface: MethodInterface | undefined = methodIdToInterface.get(selector);
@@ -46,13 +52,13 @@ export async function extractExecutedData(address: string, value: number, select
         }
     }
 
-    const contractData: ContractCreatedData = await extractContractCreatedData(address, value, web3);
+    const contractData: ContractData = await extractContractData(address, web3);
     data.contract = {...contractData};
 
     return data;
 }
 
-export async function extractDataChangedData(address: string, parameters: SolParameterWithValue[], web3: Web3): Promise<DataChangedData> {
+export async function extractDataChangedEventData(address: string, parameters: SolParameterWithValue[], web3: Web3): Promise<DataChangedData> {
     const data: DataChangedData = {key: parameters[0].value};
     data.schema = keyToERC725YSchema.get(data.key);
 

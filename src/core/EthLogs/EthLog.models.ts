@@ -35,6 +35,7 @@ export interface ExtractedLogData {
   ContractCreated?: ContractCreatedData;
   Executed?: ExecutedData;
   DataChanged?: DataChangedData;
+
 }
 
 export interface DataChangedData {
@@ -54,10 +55,13 @@ export interface ExecutedData {
   logs: EthLogs;
 }
 
-export interface ContractCreatedData extends StandardsData {
+export interface ContractCreatedData extends ContractData {
+  value: number,
+}
+
+export interface ContractData extends StandardsData{
   address: string,
   interface?: StandardInterface,
-  value: number,
 }
 
 export interface StandardsData {

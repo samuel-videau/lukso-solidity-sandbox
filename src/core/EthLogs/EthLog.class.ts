@@ -6,10 +6,11 @@ import {
   SolParameterWithValue, SolEvent, UNKNOWN_SOL_EVENT,
 } from "./EthLog.models";
 import {
-  extractContractCreatedData,
-  extractDataChangedData,
-  extractExecutedData
+  extractContractData,
+  extractDataChangedEventData,
+  extractExecutedEventData
 } from "./data-extracting/extract-log-data";
+
 
 
 export class EthLog {
@@ -52,13 +53,13 @@ export class EthLog {
     if (this._extractedData.extracted) return this._extractedData;
     switch (this._event.name) {
       case 'ContractCreated':
-        this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters[1].value, parseInt(this.parameters[2].value), this._web3);
+        this._extractedData.ContractCreated = {...await extractContractData(this.parameters[1].value, this._web3), value: parseInt(this.parameters[2].value)};
         break;
       case 'Executed':
-        this._extractedData.Executed = await extractExecutedData(this.parameters[1].value, parseInt(this.parameters[2].value), this.parameters[3].value, this.log.transactionHash, this._web3);
+        this._extractedData.Executed = await extractExecutedEventData(this.parameters[1].value, parseInt(this.parameters[2].value), this.parameters[3].value, this.log.transactionHash, this._web3);
         break;
       case 'DataChanged':
-        this._extractedData.DataChanged = await extractDataChangedData(this.log.address ,this.parameters, this._web3);
+        this._extractedData.DataChanged = await extractDataChangedEventData(this.log.address ,this.parameters, this._web3);
         break;
     }
     this._extractedData.extracted = true;
