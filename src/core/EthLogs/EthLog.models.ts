@@ -4,6 +4,7 @@ import {LSP4DigitalAsset, LSP4DigitalAssetMetadata} from "../UniversalProfile/mo
 import {LSP3UniversalProfile} from "../UniversalProfile/models/lsp3-universal-profile.model";
 import {MethodInterface} from "./data-extracting/utils/method-interfaces";
 import {ERC725JSONSchema} from "@erc725/erc725.js";
+import {EthLogs} from "./EthLogs.class";
 
 export interface Log {
   address: string;
@@ -37,7 +38,8 @@ export interface ExtractedLogData {
 export interface ExecutedData {
   address: string,
   interface: MethodInterface,
-  value: number
+  value: number,
+  logs: EthLogs
 }
 
 export interface DataChangedData extends ERC725JSONSchema{

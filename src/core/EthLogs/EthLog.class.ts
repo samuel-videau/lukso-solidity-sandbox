@@ -51,7 +51,7 @@ export class EthLog {
         this._extractedData.ContractCreated = await extractContractCreatedData(this.parameters, this._web3);
         break;
       case 'Executed':
-        this._extractedData.Executed = await extractExecutedData(this.parameters);
+        this._extractedData.Executed = await extractExecutedData(this.parameters, this.log.transactionHash, this._web3);
         break;
     }
     this._extractedData.extracted = true;
