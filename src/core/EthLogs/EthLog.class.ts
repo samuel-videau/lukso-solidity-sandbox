@@ -5,7 +5,11 @@ import {
   ExtractedLogData,
   SolParameterWithValue, SolEvent, UNKNOWN_SOL_EVENT,
 } from "./EthLog.models";
-import {extractContractCreatedData, extractExecutedData} from "./data-extracting/extract-log-data";
+import {
+  extractContractCreatedData,
+  extractDataChangedData,
+  extractExecutedData
+} from "./data-extracting/extract-log-data";
 
 
 export class EthLog {
@@ -17,7 +21,7 @@ export class EthLog {
 
   private _extractedData: ExtractedLogData = { extracted: false };
 
-  constructor(log: Log, provider: string, method: {method?: SolEvent, hashToSolMethod?: Map<string, SolEvent>}) {
+  constructor(log: Log, provider: any, method: {method?: SolEvent, hashToSolMethod?: Map<string, SolEvent>}) {
     this._log = log;
     this._web3 = new Web3(provider);
     if (method.method) {
@@ -52,6 +56,9 @@ export class EthLog {
         break;
       case 'Executed':
         this._extractedData.Executed = await extractExecutedData(this.parameters, this.log.transactionHash, this._web3);
+        break;
+      case 'DataChanged':
+        this._extractedData.DataChanged = await extractDataChangedData(this.log.address ,this.parameters, this._web3);
         break;
     }
     this._extractedData.extracted = true;

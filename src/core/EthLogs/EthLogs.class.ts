@@ -4,10 +4,10 @@ import {Log, SolEvent, UNKNOWN_SOL_EVENT} from "./EthLog.models";
 export class EthLogs {
 
   private readonly solEventsRepo: Map<string, SolEvent>;
-  private readonly provider: string;
+  private readonly provider: any;
   private readonly ethLogs: Array<EthLog>;
 
-  constructor(solEventsRepo: Map<string, SolEvent>, provider: string) {
+  constructor(solEventsRepo: Map<string, SolEvent>, provider: any) {
     this.provider = provider;
     this.ethLogs = [];
     this.solEventsRepo = solEventsRepo;
