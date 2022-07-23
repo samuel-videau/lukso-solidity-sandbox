@@ -13,7 +13,7 @@ import {extractLSP4Data} from "./contract-created/extract-lsp4-data";
 import {extractLSP3Data} from "./contract-created/extract-lsp3-data";
 import {
     methodIdToInterface,
-    MethodInterface
+    SolMethodInterface
 } from "./utils/method-identification";
 import {EthLogs} from "../EthLogs.class";
 import {topicToEvent} from "./utils/event-identification";
@@ -40,7 +40,7 @@ export async function extractContractData(address: string, web3: Web3): Promise<
 export async function extractExecutedEventData(address: string, value: number, selector: string, transactionHash: string, web3: Web3): Promise<ExecutedData> {
     const data: ExecutedData = {address, value, contract: {}, logs: new EthLogs(topicToEvent, web3.currentProvider)};
 
-    const methodInterface: MethodInterface | undefined = methodIdToInterface.get(selector);
+    const methodInterface: SolMethodInterface | undefined = methodIdToInterface.get(selector);
     if (methodInterface) {
         data.interface = methodInterface;
         const transaction = await web3.eth.getTransactionReceipt(transactionHash);

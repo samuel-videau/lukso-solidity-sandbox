@@ -2,7 +2,7 @@ import {AbiInput} from "web3-utils";
 import {StandardInterface} from "./data-extracting/utils/contract-identification/standard-interfaces";
 import {LSP4DigitalAsset, LSP4DigitalAssetMetadata} from "../UniversalProfile/models/lsp4-digital-asset.model";
 import {LSP3UniversalProfile} from "../UniversalProfile/models/lsp3-universal-profile.model";
-import {MethodInterface} from "./data-extracting/utils/method-identification";
+import {SolMethodInterface} from "./data-extracting/utils/method-identification";
 import {ERC725JSONSchema} from "@erc725/erc725.js";
 import {EthLogs} from "./EthLogs.class";
 import {DecodeDataOutput} from "@erc725/erc725.js/build/main/src/types/decodeData";
@@ -57,7 +57,7 @@ export interface DataChangedData {
 
 export interface ExecutedData {
   address: string;
-  interface?: MethodInterface;
+  interface?: SolMethodInterface;
   contract: StandardsData & {
     interface?: StandardInterface,
   };
