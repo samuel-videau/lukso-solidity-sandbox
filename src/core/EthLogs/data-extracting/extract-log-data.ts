@@ -62,7 +62,7 @@ export async function extractDataChangedEventData(address: string, parameters: S
 
     if (data.schema) {
         const erc725y = new ERC725([data.schema as ERC725JSONSchema], address, web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
-        data.actualValue = (await erc725y.fetchData())[0];
+        data.currentValue = (await erc725y.fetchData())[0];
     }
 
     return data;

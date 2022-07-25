@@ -52,7 +52,7 @@ export interface DataChangedData {
   key: string;
   schema?: ERC725JSONSchema;
   value?: DecodeDataOutput | string;
-  actualValue?: DecodeDataOutput | string;
+  currentValue?: DecodeDataOutput | string;
 }
 
 export interface ExecutedData {
