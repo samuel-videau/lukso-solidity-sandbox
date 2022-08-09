@@ -1,12 +1,12 @@
 import Form from "./Form";
 
-function PostCanvas() {
+function PostCanvas({address}: {address:string}) {
 
 
     return (
         <div className="posts">
             <h2>Write your Post and upload it to IPFS</h2>
-            <Form />
+            <Form address={address}/>
         </div>
     )
 }

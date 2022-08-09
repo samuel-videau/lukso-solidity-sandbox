@@ -1,7 +1,4 @@
 import Web3 from 'web3';
-import {HashToSolMethod, SolMethod} from "./EthLogs/EthLog.models";
-import {EthLogs} from "./EthLogs/EthLogs.class";
-import {EthLog} from "./EthLogs/EthLog.class";
 
 declare const window: any;
 
@@ -11,10 +8,12 @@ export async function connectProfile() {
   web3 = new Web3(window.ethereum);
 
   const accountsRequest: string[] = await web3.eth.requestAccounts();
-  const accounts: string[] = await web3.eth.getAccounts(); //should also yield the same address
+  //const accounts: string[] = await web3.eth.getAccounts(); //should also yield the same address
 
-  console.log(accountsRequest)
-  console.log(accounts)
+  //console.log(accountsRequest)
+  //console.log(accounts)
+
+  return web3;
 }
 
 export async function signMessage() {

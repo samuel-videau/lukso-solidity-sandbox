@@ -3,16 +3,16 @@ import { SocialPost } from "../../models/SocialPost";
 import { createSignedTx, readFile, winstonToDollar } from "../../utils/helpers";
 import { estimateCostData } from "./estimateCosts";
 import { uploadFile } from "./uploadFile";
+import { uploadData } from "./uploadData";
 
 const APPNAME = "Lookso"
 
-export const uploadPost = async (postObject: SocialPost, attachment?: string) => {
+export const uploadPost = async (postObject: SocialPost, attachment?: string): Promise<[number, string]> => {
 
     if (attachment) {
         let attachmentData = readFile(attachment);
         // Estimate Cost
         if (await winstonToDollar(await estimateCostData(attachmentData)) > 0.01) {
-            console.log
             throw (new Error("UploadPost: Attachment too big."))
         }
 
@@ -36,6 +36,6 @@ export const uploadPost = async (postObject: SocialPost, attachment?: string) =>
         {key: "Author", value: postObject.LSPXXProfilePost.author}
     ]
 
-    return await uploadFile(JSON.stringify(postObject), tags);
+    return await uploadData(Buffer.from(JSON.stringify(JSON.stringify(postObject))), tags);
  
 }

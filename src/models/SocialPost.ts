@@ -2,20 +2,21 @@ export type SocialPost = {
   LSPXXProfilePost: {
     version: string;
     author: string, // Address (UP)
+    controller:string,
     message: string,
-    links: [
+    links: Array<
       {
         title: string, 
         url: string
       }
-    ],
+    >,
     asset: {
-      hashFunction: 'keccak256(bytes)',
+      hashFunction: string,
       hash: string,
       url: string,
       fileType: string
     }
   }
   LSPXXProfilePostHash: string,
-  LSPXXProfilePostSignature: string
+  //LSPXXProfilePostSignature: string
 }
