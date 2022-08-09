@@ -1,6 +1,6 @@
 import Form from "./Form";
 
-function Post() {
+function PostCanvas() {
 
 
     return (
@@ -11,4 +11,4 @@ function Post() {
     )
 }
 
-export default Post;
+export default PostCanvas;
