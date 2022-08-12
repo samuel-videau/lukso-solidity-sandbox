@@ -2,17 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 
 import {deployUP} from "./core/lukso/up-factory";
-import {ERC725XOperationType, UniversalProfile} from "./core/UniversalProfile/UniversalProfile.class";
-import LSP7Mintable from "@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json";
-import {AbiItem} from "web3-utils";
 import {tryIdentifyingContract} from "./core/contract-identification/identify-contract";
-import {ADDRESS0} from "./utils/address0";
-import Lsp4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
-import {ERC725, ERC725JSONSchema} from "@erc725/erc725.js";
-import {EncodeDataInput} from "@erc725/erc725.js/build/main/src/types/decodeData";
-import {StandardInterface} from "./core/contract-identification/standard-interfaces";
-import {InterfaceToSchema} from "./core/contract-identification/interface-to-schema";
-import {EthLog} from "./core/EthLogs/EthLog.class";
+
 import {testPinata, pinFile} from "./utils/pinata/pinata";
 // Components
 import PostCanvas from './components/PostCanvas';
@@ -22,7 +13,12 @@ import { WebBundlr } from '@bundlr-network/client';
 import { providers } from 'ethers';
 import Web3 from 'web3';
 import { StatusBar } from './components/StatusBar/StatusBar';
-
+import { testUPClass } from './core/UniversalProfile/utils/testUp';
+import { setPermissions } from './core/UniversalProfile/utils/setPermissions';
+import { getKeyValue } from './core/UniversalProfile/utils/getKeyValue';
+import PermissionsInspect from './components/PermissionsInspect';
+import MyUP from './components/MyUP';
+import { UniversalProfile } from './core/UniversalProfile/UniversalProfile.class';
 
 
 
@@ -35,22 +31,37 @@ function App() {
 
     const [address, setAddress] = useState("")
     const [balance, setBalance] = useState("0.00")
+    const [universalProfile, setUniversalProfile] = useState({} as UniversalProfile)
 
     useEffect(() => {
 
-        console.log("running useEffect")
+        console.log("running useEffect to update address and balance")
         const fetchAddress = async () => {
             let accounts:string[];
             if (web3.eth) {
-                accounts = await web3.eth.getAccounts(); 
+                console.log("web3.eth exists");
+                accounts = await web3.eth.getAccounts();
+                console.log("Address is: "+accounts[0]) 
                 setAddress(accounts[0]);
+                return accounts[0]
+            } else return ""
+        }
+        const fetchBalance = async (address:string) => {
+            if (address) {
+                setBalance(await web3.eth.getBalance(address));
             }
         }
-        const fetchBalance = async () => {
-            if (address) setBalance(await web3.eth.getBalance(address))
+
+        const loadUP = async () => {
+            if (web3.eth) {
+                const universalProfile = new UniversalProfile("0x2cA2f608A79A6B2c7B62721E4Bf58D5D8d5B5da7", 'https://2eff.lukso.dev/ipfs/', web3);
+                await universalProfile.initialize();
+                setUniversalProfile(universalProfile);
+            }
         }
 
-        fetchAddress().then(fetchBalance)
+        fetchAddress().then((address) => fetchBalance(address))
+        loadUP();
      
     }, [web3])
     
@@ -65,45 +76,6 @@ function App() {
         console.log(bundlr)
 
         setBundlr(bundlr);
-    }
-
-    async function testUPClass() {
-      const universalProfile = new UniversalProfile("0xca4978c873C19AaEDDa7B6917dFB2CbD92866D55", 'https://2eff.lukso.dev/ipfs/', web3);
-      await universalProfile.initialize();
-
-
-        await universalProfile.subscribeLogs(0);
-        setTimeout( async () => {
-          const logs: EthLog[] = universalProfile.getLogs();
-          console.log('============LOGS============');
-          console.log('Total of logs: ' + logs.length);
-          console.log('\n\n\n');
-          for (const log of logs){
-            console.log('==============EVENT==============');
-            console.log('Name: ' + log.getName());
-            if (log.getName() === 'ContractCreated') {
-                const contractAddress = log.getParameters()[1].value;
-                const contractInterface: StandardInterface = await tryIdentifyingContract(contractAddress, web3);
-                console.log('Contract type: ' + contractInterface.name);
-                const contractSchema = InterfaceToSchema.get(contractInterface.code);
-                if (contractSchema) {
-                    try {
-                        const erc725Y = new ERC725(contractSchema, contractAddress, web3.currentProvider, {ipfsGateway: 'https://2eff.lukso.dev/ipfs/'});
-                        console.log(await erc725Y.getData());
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-        
-            }
-            console.log(log.getParameters());
-            console.log(log.getLog());
-          }
-        }, 4000);
-
-        const permissions = await universalProfile.fetchPermissionsOf('0xD77B3A5B984FDF508313F462210f5A0aA9De6BdB');
-        console.log(permissions);
-        const LSP7Contract = new web3.eth.Contract(LSP7Mintable.abi as AbiItem[]);
     }
 
 
@@ -121,11 +93,17 @@ function App() {
                 <button onClick={() => {connectBundlr()}}>Connect Bundlr</button>
                 <button onClick={() => {testPinata()}}>Test Pinata</button>
                 <button onClick={() => {pinFile()}}>Pin File</button>
+                <button onClick={() => {setPermissions(web3)}}>Set Permissions</button>
+                <button onClick={() => {getKeyValue(web3, web3.utils.keccak256("LSPXXSocialMedia"))}}>Log current jsonURL Value</button>
             </div>
             {displayStatus &&
-                <StatusBar address={address} balance={balance}/>
+                <>
+                    <StatusBar address={address} balance={balance}/>
+                    <MyUP web3={web3} universalProfile={universalProfile}/>
+                    <PermissionsInspect universalProfile={universalProfile} web3={web3} />
+                </>
             }
-            <PostCanvas address={address}/>
+            <PostCanvas address={address} web3={web3}/>
         </div>
     );
 }

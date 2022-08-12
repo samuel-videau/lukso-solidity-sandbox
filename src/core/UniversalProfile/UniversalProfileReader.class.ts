@@ -12,9 +12,28 @@ import {UniversalProfileLogTypes} from "./utils/UniversalProfileLogTypes";
 import {EthLog} from "../EthLogs/EthLog.class";
 
 import Lsp3UniversalProfileSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json';
-
 import UniversalProfileArtifact from "./abi/UniversalProfile.json";
 import {initialUniversalProfile, LSP3UniversalProfile} from "./models/lsp3-universal-profile.model";
+import { LSPXXSocialMediaSchema } from "./models/LSPXXSocialMedia";
+
+const Lsp6KeyManagerSchema = [
+  {
+    "name": "AddressPermissions[]",
+    "key": "0xdf30dba06db6a30e65354d9a64c609861f089545ca58c6b4dbe31a5f338cb0e3",
+    "keyType": "Array",
+    "valueType": "address",
+    "valueContent": "Address"
+  },
+  {
+    "name": "AddressPermissions:Permissions:<address>",
+    "key": "0x4b80742de2bf82acb3630000<address>",
+    "keyType": "MappingWithGrouping",
+    "valueType": "bytes32",
+    "valueContent": "BitArray"
+  }
+]
+
+
 
 interface GetDataDynamicKey {
   keyName: string;
@@ -52,7 +71,7 @@ export class UniversalProfileReader {
   private _logsSubscription: Subscription<Log>;
 
   constructor(address: string, ipfsGateway: string, web3: Web3) {
-    this._erc725 = new ERC725(Lsp3UniversalProfileSchema as ERC725JSONSchema[], address, web3.currentProvider, {ipfsGateway})
+    this._erc725 = new ERC725(Lsp3UniversalProfileSchema.concat(Lsp6KeyManagerSchema).concat(LSPXXSocialMediaSchema) as ERC725JSONSchema[], address, web3.currentProvider, {ipfsGateway})
     this._address = address;
     this._web3 = web3;
     this._contract = new this._web3.eth.Contract(UniversalProfileArtifact.abi as AbiItem[], address);
@@ -76,6 +95,9 @@ export class UniversalProfileReader {
 
   public async getData(keys: (string | GetDataDynamicKey)[]): Promise<DecodeDataOutput[]> {
     return await this._erc725.getData(keys);
+  }
+  public async getDataSolo(key: (string | GetDataDynamicKey)): Promise<DecodeDataOutput> {
+    return await this._erc725.getData(key);
   }
 
   public async getDataUnverified(keys: string[]): Promise<any[]> {

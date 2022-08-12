@@ -3,3 +3,6 @@ LSP0ERC725AccountBaseContract: {address: '0x360C32785109a57630Cda8a21F9B1fB33bC8
 LSP1UniversalReceiverDelegate: {address: '0xFaE34568b9a2723B02c810dC8567F58f8B1B77C2', receipt: {…}}
 LSP6KeyManager: {address: '0x94469fFdEfc3E14d61648001437EAD7Bf40E1CA2', receipt: {…}}
 LSP6KeyManagerBaseContract: {address: '0x6B4Bc203B32140Ca087C4Ad1cd51DA694107fEe7', receipt: {…}}
+
+
+Post Keeper Smart contract: 0xFb43e3051E324127992765cFc0e561549188a2Df
