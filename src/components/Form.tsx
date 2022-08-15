@@ -2,22 +2,42 @@ import ERC725 from "@erc725/erc725.js";
 import React, { useState } from "react";
 import Web3 from "web3";
 
-import { composePost } from "../utils/helpers";
-
 import { LSPXXSocialMediaSchema } from "../core/UniversalProfile/models/LSPXXSocialMedia";
-import { arweavePrefix } from "../core/arweave/arweave";
 import PostKeeper from "../models/PostKeeper.json"
 import Simple from "../models/Simple.json"
 import { AbiItem } from "web3-utils";
+import { Simulate } from "react-dom/test-utils";
+import { Post } from "../core/Post/Post.class";
+import { ArweaveClient } from "../core/arweave/ArweaveClient.class";
+import { UniversalProfile } from "../core/UniversalProfile/UniversalProfile.class";
+import { URLDataWithHash } from "@erc725/erc725.js/build/main/src/types";
 
-function Form({address, web3}: {address:string, web3:Web3}) {
+function Form({address, web3, arweave, universalProfile}: {address:string, web3:Web3, arweave:ArweaveClient, universalProfile:UniversalProfile}) {
 
     const [content, setContent] = useState("");
 
     const handleSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
 
-        let postJson = composePost(address, content)
+        // 1. Upload new post to Arweave
+        let postJson = new Post(content, address).toJson();
+
+        //2.Fetch most recent registry from that UP and create an updated one
+        let registry = await universalProfile.getData([web3.utils.keccak256("LSPXXSocialRegistry")]);
+        console.log("Json URL from registry: ");
+        console.log(registry);
+        console.log(registry[0])
+        let urlObject = (registry[0].value as URLDataWithHash)
+        console.log((urlObject.url).slice(5))
+       
+        console.log(await arweave.getTxTags((urlObject.url).slice(5)))
+
+        
+
+
+        //3. Upload updated registry to Arweave
+
+        //4. Push that registry on-chain, to the timestamper contract and the UP
 
         //let [txStatus, txId] = await uploadPost(postJson)
         let txId = "Kca8Ezc_tgaXEd2o2KgTrL15vqiztf_61b287lmEK7g"
@@ -35,7 +55,7 @@ function Form({address, web3}: {address:string, web3:Web3}) {
               keyName: 'LSPXXSocialRegistry',
               value: {
                 json: postJson,
-                url: arweavePrefix+txId,
+                url: arweave.urlPrefix+txId,
               },
             },
           ]);
@@ -47,8 +67,8 @@ function Form({address, web3}: {address:string, web3:Web3}) {
         .then((receipt:any) => {
           console.log(receipt)
         });*/
-
-        const postKeeper = new web3.eth.Contract(PostKeeper.abi as AbiItem[], "0x106A3AEEf0B19Ff321eDa4b8662bC393c270acF8");
+ 
+        /*const postKeeper = new web3.eth.Contract(PostKeeper.abi as AbiItem[], "0xdc82BF6487b1B01FAaeBB5130EC2513630465F17"); 
         console.log("posthash: "+postJson.LSPXXProfilePostHash);
         console.log("jsonURL: "+jsonURL.values[0])
         let txData = postKeeper.methods.post(postJson.LSPXXProfilePostHash, jsonURL.values[0]).encodeABI(); 
@@ -58,12 +78,19 @@ function Form({address, web3}: {address:string, web3:Web3}) {
             to: postKeeper.options.address,
             value: 0,
             data: txData,
-            gas: 5000000,
+            gas:9999999,
             gasPrice: '1',
           }).then((receipt:any) => {
             console.log(receipt);
-          })
+          })*/
+    }
 
+    const simulatePost = async () => {
+      let post = new Post(content, address);
+      let priceInWinston = await arweave.estimateCost(post.byteSize());
+      let priceInDollar = await arweave.winstonToDollar(priceInWinston);
+      console.log("Price in Dollar: $"+priceInDollar)
+      //let [txStatus, txId] = await uploadPost(postJson)
     }
 
     return (
@@ -71,8 +98,9 @@ function Form({address, web3}: {address:string, web3:Web3}) {
             <form onSubmit={handleSubmit}>
                 <label>Content:   </label>
                 <textarea name="content" value={content} cols={40} rows={5} onChange={(e) => setContent(e.target.value)}></textarea>
-                <input type="submit" value="Upload to Arweave" />
+                <input type="submit" value="Post" />
             </form>
+            <button onClick={() => simulatePost()}>Simulate Post</button>
         </div>
 
     )

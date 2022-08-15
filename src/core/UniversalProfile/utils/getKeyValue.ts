@@ -8,6 +8,8 @@ export async function getKeyValue(web3:Web3, key:string): Promise<string> {
 
     try {
         let result = (await universalProfile.getDataSolo(key)).value;
+        console.log(result);
+        console.log((result as any).url);
         if (typeof(result) === "string")  return result;
         else return (result as any).url;
     } catch (error:any) {

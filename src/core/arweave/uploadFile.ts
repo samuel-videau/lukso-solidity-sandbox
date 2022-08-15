@@ -1,7 +1,6 @@
 import { arweave } from "./arweave";
-import { Tag } from "../../models/Tag"
+import { Tag } from "../Post/Tag"
 import { createSignedTx, readFile } from "../../utils/helpers";
-import fs from "fs";
 
 export const uploadFile = async (pathname: string, tags?: Tag[]) => {
     // Read the file into the program
@@ -14,6 +13,7 @@ export const uploadFile = async (pathname: string, tags?: Tag[]) => {
     switch (response.status) {
         case 200:
             console.log("Transaction " + tx.id + " submitted sucessfully");
+            console.log(response);
             return response.status;
         default:
             throw new Error("uploadPost: Failed to upload post data")

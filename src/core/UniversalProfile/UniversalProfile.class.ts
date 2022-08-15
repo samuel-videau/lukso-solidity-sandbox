@@ -63,11 +63,11 @@ export class UniversalProfile extends UniversalProfileReader {
     const utils = this._web3.utils;
     try {
 
-      let length = (await this.getDataUnverified([permissionsArrayKey]))[0];
-      let newLengthUnpadded = utils.numberToHex(utils.hexToNumber(length) + 1)
+      let permissionsLength = (await this.getDataUnverified([permissionsArrayKey]))[0];
+      let newLengthUnpadded = utils.numberToHex(utils.hexToNumber(permissionsLength) + 1)
       let newLengthPadded = utils.padLeft( newLengthUnpadded, 66-newLengthUnpadded.length+1);
       console.log("New length: "+newLengthPadded)
-      console.log("AddressPermissions[] value: "+length);
+      console.log("AddressPermissions[] value: "+permissionsLength);
 
       /*const lengthData = this._erc725.encodeData([{
         keyName: "AddressPermissions[]",
@@ -80,11 +80,26 @@ export class UniversalProfile extends UniversalProfileReader {
         value: permissionsKey
       }])
 
-      let paddedIndex = web3.utils.padLeft(web3.utils.numberToHex(4), 34 - web3.utils.numberToHex(4).length + 1)
+      let paddedIndex = web3.utils.padLeft(web3.utils.numberToHex(permissionsLength), 34 - web3.utils.numberToHex(permissionsLength).length + 1)
 
-      await this.setData([utils.keccak256("AddressPermissions[]")], [newLengthPadded]); // Updates AddressPermissions[] length
-      await this.setData([utils.keccak256("AddressPermissions[]").slice(0,34) + paddedIndex.slice(2)], [address]); // Updates AddressPermissions[i] value
-      await this.setData(permissionsData.keys, permissionsData.values); // Updates address permissions in the mapping
+      let keys:string[] = [];
+      let values:string[] = [];
+      // 1. Updates AddressPermissions[] length
+      keys.push(utils.keccak256("AddressPermissions[]"));
+      values.push(newLengthPadded);
+      // 2. Updates AddressPermissions[i] value
+      keys.push(utils.keccak256("AddressPermissions[]").slice(0,34) + paddedIndex.slice(2));
+      values.push(address);
+      // 3. Updates address permissions in the mapping
+      keys = keys.concat(permissionsData.keys);
+      values = values.concat(permissionsData.values);
+      console.log(keys);
+      console.log(values)
+      await this._contract.methods.setData(keys, values).send({from: this._eoa}); 
+
+      /*await this._contract.methods.setData([utils.keccak256("AddressPermissions[]")], [newLengthPadded]).send({from: this._eoa}); 
+      await this._contract.methods.setData([utils.keccak256("AddressPermissions[]").slice(0,34) + paddedIndex.slice(2)], [address]).send({from: this._eoa}); // 2. Updates AddressPermissions[i] value
+      await this._contract.methods.setData(permissionsData.keys, permissionsData.values).send({from: this._eoa}); // 3. Updates address permissions in the mapping*/
 
     } catch (error:any) {
       console.error("Failed to set permissions: "+error.message)

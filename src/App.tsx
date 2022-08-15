@@ -19,6 +19,7 @@ import { getKeyValue } from './core/UniversalProfile/utils/getKeyValue';
 import PermissionsInspect from './components/PermissionsInspect';
 import MyUP from './components/MyUP';
 import { UniversalProfile } from './core/UniversalProfile/UniversalProfile.class';
+import { ArweaveClient } from './core/arweave/ArweaveClient.class';
 
 
 
@@ -32,6 +33,7 @@ function App() {
     const [address, setAddress] = useState("")
     const [balance, setBalance] = useState("0.00")
     const [universalProfile, setUniversalProfile] = useState({} as UniversalProfile)
+    const [arweave, setArweave] = useState({} as ArweaveClient)
 
     useEffect(() => {
 
@@ -60,8 +62,15 @@ function App() {
             }
         }
 
+        const loadArweave = async() => {
+            const arweave = new ArweaveClient();
+            setArweave(arweave);
+        }
+
         fetchAddress().then((address) => fetchBalance(address))
         loadUP();
+        loadArweave();
+
      
     }, [web3])
     
@@ -93,8 +102,7 @@ function App() {
                 <button onClick={() => {connectBundlr()}}>Connect Bundlr</button>
                 <button onClick={() => {testPinata()}}>Test Pinata</button>
                 <button onClick={() => {pinFile()}}>Pin File</button>
-                <button onClick={() => {setPermissions(web3)}}>Set Permissions</button>
-                <button onClick={() => {getKeyValue(web3, web3.utils.keccak256("LSPXXSocialMedia"))}}>Log current jsonURL Value</button>
+                <button onClick={() => {getKeyValue(web3, web3.utils.keccak256("LSPXXSocialRegistry"))}}>Log current jsonURL Value</button>
             </div>
             {displayStatus &&
                 <>
@@ -103,7 +111,7 @@ function App() {
                     <PermissionsInspect universalProfile={universalProfile} web3={web3} />
                 </>
             }
-            <PostCanvas address={address} web3={web3}/>
+            <PostCanvas address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
         </div>
     );
 }

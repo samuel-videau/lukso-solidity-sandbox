@@ -1,5 +1,5 @@
 import { arweave } from "./arweave";
-import { Tag } from "../../models/Tag"
+import { Tag } from "../Post/Tag"
 import { createSignedTx } from "../../utils/helpers";
 
 export const uploadData = async (data: Buffer, tags?: Tag[]): Promise<[number, string]> => {

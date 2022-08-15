@@ -1,9 +1,9 @@
 import axios from "axios";
 import { arweave, arweaveAddress } from "../core/arweave/arweave";
 import fs from "fs";
-import { Tag } from "../models/Tag";
+import { Tag } from "../core/Post/Tag";
 import { web3 } from "../core/web3";
-import { SocialPost } from "../models/SocialPost";
+import { SocialPost } from "../core/Post/SocialPost";
 
 const APPNAME = "Lookso";
 const ARID = 5632;
@@ -70,37 +70,4 @@ export const createSignedTx = async (txData:Buffer, tags?:Tag[]) => {
 
 export const getAddress = async () => {
   return await arweave.wallets.getAddress(arweaveAddress);
-}
-
-
-export const composePost = (upAddress:string, message:string) => {
-  let postObject:SocialPost;
-  let LSPXXProfilePost = {
-    version: "0.0.1",
-    author: upAddress,
-    controller: "controllerAddress",
-    message: message,
-    links: [
-      {
-        title: "string", 
-        url: "string"
-      }
-    ],
-    asset: {
-      hashFunction: 'keccak256(bytes)',
-      hash: "string",
-      url: "string",
-      fileType: "string"
-    }
-  }
-
-  let LSPXXProfilePostHash = web3.utils.keccak256(JSON.stringify(LSPXXProfilePost))
-  //let LSPXXProfilePostSignature = web3.eth.sign(LSPXXProfilePostHash, upAddress);
-
-  postObject = {
-    LSPXXProfilePost,
-    LSPXXProfilePostHash
-  }
-
-  return postObject;
 }

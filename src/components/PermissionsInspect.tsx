@@ -2,28 +2,25 @@ import { useState } from "react";
 import Web3 from "web3";
 import { UniversalProfile } from "../core/UniversalProfile/UniversalProfile.class";
 import { getPermissions } from "../core/UniversalProfile/utils/getPermissions";
+import { setPermissions } from "../core/UniversalProfile/utils/setPermissions";
 
 export default function PermissionsInspect({universalProfile, web3}: {universalProfile:UniversalProfile, web3:Web3}) {
 
-    
     const [address, setAddress] = useState("");
-    const [permissions, setPermissions] = useState("");
-
-    const handleSubmit = async (event: React.SyntheticEvent) => {
-        event.preventDefault();
-        //setPermissions(await getPermissions(web3));
-        await getPermissions(web3)
-
-    }
 
 
+    //<input type="submit" name="getBtn" value="Get Permissions" />
 
   return (
-    <form onSubmit={handleSubmit}>
-        <label>Address:   </label>
-        <input type="text" name="address" value={address} onChange={(e) => setAddress(e.target.value)} />
-        <input type="submit" value="Get Permissions" />
-    </form>
+    <div>
+      <label>Address:   </label>
+      <input type="text" name="address" size={48} value={address} onChange={(e) => setAddress(e.target.value)} />
+      <button onClick={async () => {await getPermissions(web3)}}>Get Permissions</button>
+      <button onClick={async () => {await setPermissions(web3, address)}}>Set Permissions</button>
+    </div>
+    
+
+
   )
 
 }

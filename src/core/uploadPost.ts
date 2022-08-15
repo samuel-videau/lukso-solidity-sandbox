@@ -1,9 +1,9 @@
-import { arweave, arweaveAddress } from "./arweave";
-import { SocialPost } from "../../models/SocialPost";
-import { createSignedTx, readFile, winstonToDollar } from "../../utils/helpers";
-import { estimateCostData } from "./estimateCosts";
-import { uploadFile } from "./uploadFile";
-import { uploadData } from "./uploadData";
+import { arweave, arweaveAddress } from "./arweave/arweave";
+import { SocialPost } from "./Post/SocialPost";
+import { createSignedTx, readFile, winstonToDollar } from "../utils/helpers";
+import { estimateCostData } from "./arweave/estimateCosts";
+import { uploadFile } from "./arweave/uploadFile";
+import { uploadData } from "./arweave/uploadData";
 
 const APPNAME = "Lookso"
 
@@ -23,6 +23,7 @@ export const uploadPost = async (postObject: SocialPost, attachment?: string): P
         ]
 
         await uploadFile(attachment, tags);
+        //postObject.LSPXXProfilePost.asset.url = ""
 
     }
 
