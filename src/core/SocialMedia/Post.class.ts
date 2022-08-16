@@ -1,6 +1,6 @@
-import { PostAsset } from "./PostAsset";
-import { Link } from "./Link";
-import { SocialPost } from "./SocialPost";
+import { PostAsset } from "./types/PostAsset";
+import { Link } from "./types/Link";
+import { SocialPost } from "./types/SocialPost";
 import { web3 } from "../web3";
 
 
@@ -13,11 +13,20 @@ export class Post  {
     protected readonly _links?: Link[];
     protected readonly _asset?: PostAsset | null;
 
-    constructor(message: string, author: string, links?: Link[], asset?: PostAsset) {
-        this._author = author;
-        this._message = message;
-        this._links = links? links : [];
-        this._asset = asset? asset : null;
+
+    constructor(message: string | SocialPost, author?: string, links?: Link[], asset?: PostAsset) {
+        if (typeof message === "string") {
+            this._author = author? author : "";
+            this._message = message;
+            this._links = links? links : [];
+            this._asset = asset? asset : null;
+        } else {
+            this._author = message.LSPXXProfilePost.author;
+            this._message = message.LSPXXProfilePost.message;
+            this._links = message.LSPXXProfilePost.links;
+            this._asset = message.LSPXXProfilePost.asset;
+            this._version = message.LSPXXProfilePost.version;
+        }
 
     }
 

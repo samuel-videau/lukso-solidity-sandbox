@@ -145,4 +145,10 @@ export class UniversalProfileReader {
     const data = await this._erc725.fetchData(['LSP3Profile']);
     this._metadata = JSON.parse(JSON.stringify(data[0])).value.LSP3Profile as LSP3UniversalProfile;
   }
+
+  public async getJsonUrlContent(key:string) {
+    let jsonUrl = await this.getData([key]);
+    return (jsonUrl[0].value as URLDataWithHash).url.slice(5);
+  }
+  
 }

@@ -1,5 +1,5 @@
 import { arweave, arweaveAddress } from "./arweave/arweave";
-import { SocialPost } from "./Post/SocialPost";
+import { SocialPost } from "./SocialMedia/types/SocialPost";
 import { createSignedTx, readFile, winstonToDollar } from "../utils/helpers";
 import { estimateCostData } from "./arweave/estimateCosts";
 import { uploadFile } from "./arweave/uploadFile";
@@ -17,9 +17,9 @@ export const uploadPost = async (postObject: SocialPost, attachment?: string): P
         }
 
         let tags = [
-            {key: "Content-Type", value: "image/jpeg"},
-            {key: "App-Name", value: APPNAME},
-            {key: "Parent-Hash", value: postObject.LSPXXProfilePostHash}
+            {name: "Content-Type", value: "image/jpeg"},
+            {name: "App-Name", value: APPNAME},
+            {name: "Parent-Hash", value: postObject.LSPXXProfilePostHash}
         ]
 
         await uploadFile(attachment, tags);
@@ -31,10 +31,10 @@ export const uploadPost = async (postObject: SocialPost, attachment?: string): P
     console.log("Estimated Transaction cost: "+await estimateCostData(Buffer.from(JSON.stringify(postObject))))
 
     let tags = [
-        {key: "Type", value: postObject.LSPXXProfilePostHash ? "comment" : "post"},
-        {key: "App-name", value: APPNAME},
-        {key: "Parent-Hash", value: postObject.LSPXXProfilePostHash},
-        {key: "Author", value: postObject.LSPXXProfilePost.author}
+        {name: "Type", value: postObject.LSPXXProfilePostHash ? "comment" : "post"},
+        {name: "App-name", value: APPNAME},
+        {name: "Parent-Hash", value: postObject.LSPXXProfilePostHash},
+        {name: "Author", value: postObject.LSPXXProfilePost.author}
     ]
 
     return await uploadData(Buffer.from(JSON.stringify(JSON.stringify(postObject))), tags);

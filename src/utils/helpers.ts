@@ -1,11 +1,8 @@
 import axios from "axios";
 import { arweave, arweaveAddress } from "../core/arweave/arweave";
 import fs from "fs";
-import { Tag } from "../core/Post/Tag";
-import { web3 } from "../core/web3";
-import { SocialPost } from "../core/Post/SocialPost";
+import { Tag } from "../core/SocialMedia/types/Tag";
 
-const APPNAME = "Lookso";
 const ARID = 5632;
 
 export const getSizeInBytes = (obj:any) => {
@@ -58,7 +55,7 @@ export const createSignedTx = async (txData:Buffer, tags?:Tag[]) => {
   // Add Tags if there are any
   if (tags) {
     tags.forEach((tag) => {
-      tx.addTag(tag.key, tag.value)
+      tx.addTag(tag.name, tag.value)
     }) 
   }
     

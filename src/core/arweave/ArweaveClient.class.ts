@@ -1,7 +1,7 @@
 import _arweaveWallet from "./arweaveAddress.json";
 import Arweave from "arweave";
 import { JWK } from "./JWK";
-import { Tag } from "../Post/Tag";
+import { Tag } from "../SocialMedia/types/Tag";
 
 export class ArweaveClient {
     protected readonly _urlPrefix = "ar://";
@@ -21,7 +21,7 @@ export class ArweaveClient {
         // Add Tags if there are any
         if (tags) {
         tags.forEach((tag) => {
-            tx.addTag(tag.key, tag.value)
+            tx.addTag(tag.name, tag.value)
         }) 
         }
         // Sign
@@ -39,13 +39,50 @@ export class ArweaveClient {
         }
     }
 
-    public async download(txId:string) {
+    public async downloadJson(txId:string) {
+        let response = await fetch(`https://arweave.net/${txId}`);
+        switch (response.status) {
+            case 200:
+                try {
+                    return response.json();
+                } catch (err: any) {
+                    throw new Error(`https://arweave.net/${txId}`+": Not a valid JSON object")
+                }
+            case 400 | 404:
+                throw new Error(`https://arweave.net/${txId}`+": Unable to download. Transaction not found")
+            default:
+                throw new Error(`https://arweave.net/${txId}`+": Unknown response code") 
 
+        }
     }
 
     public async getTxTags(txId:string): Promise<any> {
-        let response = await fetch(`https://arweave.net/tx/${txId}/tags`);
-        return response.json();
+        // let response = await fetch(`https://arweave.net/tx/${txId}/tags`);
+        // return response.json();
+        let response = await fetch('https://arweave.net/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `
+                    query {
+                        transactions(ids: ["ZkepadSgVoWHk-v_O9DXFMRJcIOWXxfcpftGty8QRAw"]) {
+                            edges {
+                                node {
+                                    id
+                                    tags {
+                                        name
+                                        value
+                                    }
+                                }
+                            }
+                        }
+                    }
+                `,
+            })
+        })
+        return (await response.json()).data.transactions.edges[0].node.tags;
     }
 
     get urlPrefix(): string {
@@ -54,6 +91,10 @@ export class ArweaveClient {
 
     get wallet(): JWK{
         return this._wallet;
+    }
+
+    get address():Promise<string> {
+        return this._provider.wallets.getAddress(this._wallet);
     }
 
     public async estimateCost(byteSize:number): Promise<string> {

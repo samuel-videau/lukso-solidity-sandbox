@@ -7,10 +7,13 @@ import PostKeeper from "../models/PostKeeper.json"
 import Simple from "../models/Simple.json"
 import { AbiItem } from "web3-utils";
 import { Simulate } from "react-dom/test-utils";
-import { Post } from "../core/Post/Post.class";
+import { Post } from "../core/SocialMedia/Post.class";
 import { ArweaveClient } from "../core/arweave/ArweaveClient.class";
 import { UniversalProfile } from "../core/UniversalProfile/UniversalProfile.class";
 import { URLDataWithHash } from "@erc725/erc725.js/build/main/src/types";
+
+import { Registry } from "../core/SocialMedia/Registry.class";
+import { ArweaveObject } from "../core/arweave/ArweaveObject.class";
 
 function Form({address, web3, arweave, universalProfile}: {address:string, web3:Web3, arweave:ArweaveClient, universalProfile:UniversalProfile}) {
 
@@ -20,30 +23,43 @@ function Form({address, web3, arweave, universalProfile}: {address:string, web3:
         event.preventDefault();
 
         // 1. Upload new post to Arweave
-        let postJson = new Post(content, address).toJson();
+        let post = new Post(content, address);
+        let postJson = post.toJson();
+        let arweavePost = new ArweaveObject(post)
+        arweavePost.txId = await arweave.upload(post.toData(), arweavePost.tags);
 
         //2.Fetch most recent registry from that UP and create an updated one
-        let registry = await universalProfile.getData([web3.utils.keccak256("LSPXXSocialRegistry")]);
-        console.log("Json URL from registry: ");
-        console.log(registry);
-        console.log(registry[0])
-        let urlObject = (registry[0].value as URLDataWithHash)
-        console.log((urlObject.url).slice(5))
+        let registryJsonUrl = await universalProfile.getData([web3.utils.keccak256("LSPXXSocialRegistry")]);
+        // console.log("Json URL from registry: ");
+        // console.log(registryUrl);
+        // console.log(registryUrl[0])
+        let urlObject = (registryJsonUrl[0].value as URLDataWithHash)
+        let registryId = urlObject.url.slice(5);
+        //console.log((urlObject.url).slice(5))
        
-        console.log(await arweave.getTxTags((urlObject.url).slice(5)))
+        // Handle situations where content might not be JSON
+        // const objTags:Array<Tag> = await arweave.getTxTags((urlObject.url).slice(5));
+        // console.log(objTags)
+        // let contentType:Tag | undefined = objTags.find(tag => tag.name == "Content-Type");
 
+        let registry;
+        try {
+          let registryJson = await arweave.downloadJson(registryId);
+          console.log(registryJson)
+          registry = new Registry(registryJson);
+        }
+        catch (error:any) {
+          if (error.message) console.log("Unable to fetch Social Registry. "+error.message)
+          registry = new Registry();
+        }
         
-
-
+        registry.addPost(arweavePost)
         //3. Upload updated registry to Arweave
+        let arweaveRegistry = new ArweaveObject(registry);
+        arweaveRegistry.txId = await arweave.upload(arweaveRegistry.object.toData(), arweaveRegistry.tags)
 
         //4. Push that registry on-chain, to the timestamper contract and the UP
 
-        //let [txStatus, txId] = await uploadPost(postJson)
-        let txId = "Kca8Ezc_tgaXEd2o2KgTrL15vqiztf_61b287lmEK7g"
-        console.log("Uploaded with txId: ", txId)
-
-        // Pinata.pinText(content); Deprecated, we're not using IPFS anymore
         const provider = new Web3.providers.HttpProvider(
             'https://rpc.l16.lukso.network',
         );
@@ -54,8 +70,8 @@ function Form({address, web3, arweave, universalProfile}: {address:string, web3:
             {
               keyName: 'LSPXXSocialRegistry',
               value: {
-                json: postJson,
-                url: arweave.urlPrefix+txId,
+                json: arweaveRegistry.object.toJson(),
+                url: arweaveRegistry.url,
               },
             },
           ]);
@@ -68,7 +84,7 @@ function Form({address, web3, arweave, universalProfile}: {address:string, web3:
           console.log(receipt)
         });*/
  
-        /*const postKeeper = new web3.eth.Contract(PostKeeper.abi as AbiItem[], "0xdc82BF6487b1B01FAaeBB5130EC2513630465F17"); 
+        const postKeeper = new web3.eth.Contract(PostKeeper.abi as AbiItem[], "0xdc82BF6487b1B01FAaeBB5130EC2513630465F17"); 
         console.log("posthash: "+postJson.LSPXXProfilePostHash);
         console.log("jsonURL: "+jsonURL.values[0])
         let txData = postKeeper.methods.post(postJson.LSPXXProfilePostHash, jsonURL.values[0]).encodeABI(); 
@@ -82,7 +98,7 @@ function Form({address, web3, arweave, universalProfile}: {address:string, web3:
             gasPrice: '1',
           }).then((receipt:any) => {
             console.log(receipt);
-          })*/
+          })
     }
 
     const simulatePost = async () => {

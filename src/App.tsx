@@ -20,6 +20,7 @@ import PermissionsInspect from './components/PermissionsInspect';
 import MyUP from './components/MyUP';
 import { UniversalProfile } from './core/UniversalProfile/UniversalProfile.class';
 import { ArweaveClient } from './core/arweave/ArweaveClient.class';
+import PostList from './components/PostList';
 
 
 
@@ -107,11 +108,11 @@ function App() {
             {displayStatus &&
                 <>
                     <StatusBar address={address} balance={balance}/>
-                    <MyUP web3={web3} universalProfile={universalProfile}/>
                     <PermissionsInspect universalProfile={universalProfile} web3={web3} />
+                    <PostCanvas address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
+                    <PostList address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
                 </>
-            }
-            <PostCanvas address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
+            } 
         </div>
     );
 }
