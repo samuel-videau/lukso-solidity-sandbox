@@ -4,6 +4,7 @@ import { ArweaveTransaction } from "./ArweaveTransaction.class";
 
 export class ArweaveObject extends ArweaveTransaction {
     protected readonly _object:any;
+    protected readonly _type:string = "json"
     protected readonly _tags = [
         {name:"Content-Type", value:"application/json"},
         {name:"App-Name", value:"Lookso"}

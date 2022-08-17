@@ -56,6 +56,26 @@ export class ArweaveClient {
         }
     }
 
+    public async downloadImage(txId:string) {
+        let response = await fetch(`https://arweave.net/${txId}`);
+        switch (response.status) {
+            case 200:
+                try {
+                    console.log(response)
+                    let responseJson = await response.json()
+                    console.log(responseJson)
+                    return responseJson
+                } catch (err: any) {
+                    throw new Error(`https://arweave.net/${txId}`+": Not a valid JSON object")
+                }
+            case 400 | 404:
+                throw new Error(`https://arweave.net/${txId}`+": Unable to download. Transaction not found")
+            default:
+                throw new Error(`https://arweave.net/${txId}`+": Unknown response code") 
+
+        }
+    }
+
     public async getTxTags(txId:string): Promise<any> {
         // let response = await fetch(`https://arweave.net/tx/${txId}/tags`);
         // return response.json();

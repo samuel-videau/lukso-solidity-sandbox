@@ -2,6 +2,7 @@ import { PostAsset } from "./types/PostAsset";
 import { Link } from "./types/Link";
 import { SocialPost } from "./types/SocialPost";
 import { web3 } from "../web3";
+import { ArweaveTransaction } from "../arweave/ArweaveTransaction.class";
 
 
 export class Post  {
@@ -10,11 +11,12 @@ export class Post  {
     protected readonly _message: string;
     protected readonly _version: string = "0.0.1"; 
     protected readonly _controller: string = "";  
-    protected readonly _links?: Link[];
-    protected readonly _asset?: PostAsset | null;
+    protected readonly _links: Link[];
+    protected readonly _asset: PostAsset | null;
+    protected _timestamp:number | undefined;
 
 
-    constructor(message: string | SocialPost, author?: string, links?: Link[], asset?: PostAsset) {
+    constructor(message: string | SocialPost, author?: string, asset?: PostAsset, links?: Link[]) {
         if (typeof message === "string") {
             this._author = author? author : "";
             this._message = message;
@@ -52,6 +54,20 @@ export class Post  {
     get hash(): string {
         return web3.utils.keccak256(JSON.stringify(this.object));
     }
+
+    get asset():PostAsset | null {
+        return this._asset;
+    }
+
+    get date():Date {
+        if (this._timestamp) return new Date(this._timestamp);
+        throw new Error("Undefined Date. Trying to get Date from a post without Timestamp")
+    }
+
+    set timestamp(timestamp:number) {
+        this._timestamp = timestamp;
+    }
+
 
     public toJson(): SocialPost{
         let LSPXXProfilePost = this.object;

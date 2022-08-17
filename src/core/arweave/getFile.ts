@@ -14,7 +14,7 @@ export const getFilebyTxid = async (txid: string) => {
             console.error("Tx not found");
             break;
           default:
-            console.error("Data nto found for TX");
+            console.error("Data not found for TX");
     }
 
     return content
