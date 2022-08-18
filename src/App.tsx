@@ -6,21 +6,20 @@ import {tryIdentifyingContract} from "./core/contract-identification/identify-co
 
 import {testPinata, pinFile} from "./utils/pinata/pinata";
 // Components
-import PostCanvas from './components/PostCanvas';
+import PostSection from './components/Posts/PostSection';
 // Libraries
-import {connectProfile, signMessage, web3} from "./core/web3";
+import {connectProfile, signMessage} from "./core/web3";
 import { WebBundlr } from '@bundlr-network/client';
 import { providers } from 'ethers';
 import Web3 from 'web3';
 import { StatusBar } from './components/StatusBar/StatusBar';
 import { testUPClass } from './core/UniversalProfile/utils/testUp';
-import { setPermissions } from './core/UniversalProfile/utils/setPermissions';
 import { getKeyValue } from './core/UniversalProfile/utils/getKeyValue';
 import PermissionsInspect from './components/PermissionsInspect';
 import MyUP from './components/MyUP';
 import { UniversalProfile } from './core/UniversalProfile/UniversalProfile.class';
 import { ArweaveClient } from './core/arweave/ArweaveClient.class';
-import PostList from './components/PostList';
+import PostList from './components/Posts/PostList';
 
 
 
@@ -109,8 +108,7 @@ function App() {
                 <>
                     <StatusBar address={address} balance={balance}/>
                     <PermissionsInspect universalProfile={universalProfile} web3={web3} />
-                    <PostCanvas address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
-                    <PostList address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
+                    <PostSection address={address} web3={web3} arweave={arweave} universalProfile={universalProfile}/>
                 </>
             } 
         </div>

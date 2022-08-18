@@ -2,29 +2,28 @@ import ERC725 from "@erc725/erc725.js";
 import React, { useState } from "react";
 import Web3 from "web3";
 
-import { LSPXXSocialMediaSchema } from "../core/UniversalProfile/models/LSPXXSocialMedia";
-import PostKeeper from "../models/PostKeeper.json"
-import Simple from "../models/Simple.json"
+import { LSPXXSocialMediaSchema } from "../../core/UniversalProfile/models/LSPXXSocialMedia";
+import TimeStamper from "../../core/SocialMedia/TimeStamperArtifact.json";
 import { AbiItem } from "web3-utils";
 import { Simulate } from "react-dom/test-utils";
-import { Post } from "../core/SocialMedia/Post.class";
-import { ArweaveClient } from "../core/arweave/ArweaveClient.class";
-import { UniversalProfile } from "../core/UniversalProfile/UniversalProfile.class";
+import { Post } from "../../core/SocialMedia/Post.class";
+import { ArweaveClient } from "../../core/arweave/ArweaveClient.class";
+import { UniversalProfile } from "../../core/UniversalProfile/UniversalProfile.class";
 import { URLDataWithHash } from "@erc725/erc725.js/build/main/src/types";
 
-import { Registry } from "../core/SocialMedia/Registry.class";
-import { ArweaveObject } from "../core/arweave/ArweaveObject.class";
-import { ArweaveImage } from "../core/arweave/ArweaveImage";
-import { Image } from "../core/SocialMedia/Image.class";
+import { Registry } from "../../core/SocialMedia/Registry.class";
+import { ArweaveObject } from "../../core/arweave/ArweaveObject.class";
+import { ArweaveImage } from "../../core/arweave/ArweaveImage";
+import { Image } from "../../core/SocialMedia/Image.class";
 
-function Form({address, web3, arweave, universalProfile}: {address:string, web3:Web3, arweave:ArweaveClient, universalProfile:UniversalProfile}) {
+function Form({address, web3, arweave, universalProfile, addPost}: {address:string, web3:Web3, arweave:ArweaveClient, universalProfile:UniversalProfile, addPost:Function}) {
 
     const [content, setContent] = useState("");
     const [userFile, setUserFile] = useState<File | undefined>(undefined);
 
     const handleSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
-        let post;
+        let post:Post;
         //0. If userFile, then upload image to Arweave
         if (userFile) {
           let image = new Image(userFile);
@@ -88,20 +87,21 @@ function Form({address, web3, arweave, universalProfile}: {address:string, web3:
             },
           ]);
  
-        const postKeeper = new web3.eth.Contract(PostKeeper.abi as AbiItem[], "0xdc82BF6487b1B01FAaeBB5130EC2513630465F17"); 
+        const timeStamper = new web3.eth.Contract(TimeStamper.abi as AbiItem[], "0xe3c6642a58ec9E75F0AB4F3eBbbd140EecaDa177"); 
         console.log("posthash: "+postJson.LSPXXProfilePostHash);
         console.log("jsonURL: "+jsonURL.values[0])
-        let txData = postKeeper.methods.post(postJson.LSPXXProfilePostHash, jsonURL.values[0]).encodeABI(); 
+        let txData = timeStamper.methods.post(postJson.LSPXXProfilePostHash, jsonURL.values[0]).encodeABI(); 
 
-        await web3.eth.sendTransaction({
+        web3.eth.sendTransaction({
             from: address,
-            to: postKeeper.options.address,
+            to: timeStamper.options.address,
             value: 0,
             data: txData,
             gas:9999999,
             gasPrice: '1',
           }).then((receipt:any) => {
             console.log(receipt);
+            addPost(post)
           })
     }
 

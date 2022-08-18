@@ -59,12 +59,16 @@ export class Post  {
         return this._asset;
     }
 
-    get date():Date {
-        if (this._timestamp) return new Date(this._timestamp);
-        throw new Error("Undefined Date. Trying to get Date from a post without Timestamp")
+    get date():Date | undefined {
+        if (this._timestamp) return new Date(this._timestamp * 1000); //Convert from UNIX timestamp
+       return undefined;
     }
 
-    set timestamp(timestamp:number) {
+    get timestamp():number | undefined {
+        return this._timestamp;
+    }
+
+    set timestamp(timestamp:number | undefined) {
         this._timestamp = timestamp;
     }
 
